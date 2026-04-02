@@ -486,7 +486,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                     reduction: format!("{:.2}%", reduction_val),
                 };
 
-                println!("📤 {} [Fog]: Enviando dados RLE para o Receiver...", ambiente_clone);
+                if ambiente_clone == "Thing" {
+                    println!("📤 {} [Thing]: Enviando dados RLE para o LoRa relay...", ambiente_clone);
+                } else {
+                    println!("📤 {} [Fog]: Enviando dados RLE para o Receiver...", ambiente_clone);
+                }
                 let res: Result<reqwest::Response, reqwest::Error> = client.post(&receiver_url_clone)
                     .json(&payload)
                     .send()
