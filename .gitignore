@@ -1,0 +1,4 @@
+**/target/
+**/*.wasm
+monitoramento.txt
+.DS_Store

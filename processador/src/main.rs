@@ -44,6 +44,16 @@ struct RLEOutput {
     quantity: u32,
 }
 
+// Estrutura para envio ao Receiver (Cloud)
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct RLEPayload {
+    rle_data: Vec<RLEOutput>,
+    compressed_string: String,
+    original_count: usize,
+    compressed_count: usize,
+    reduction: String,
+}
+
 // Estado compartilhado da aplicação
 struct AppState {
     sensor_data: Mutex<Vec<SensorData>>,
@@ -422,8 +432,10 @@ fn response_build(body: &str) -> Response<Body> {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let porta_str = env::var("PORTA")
-        .unwrap_or_else(|_| "8081".to_string());
+    let args: Vec<String> = env::args().collect();
+    let porta_str = args.get(1)
+        .cloned()
+        .unwrap_or_else(|| env::var("PORTA").unwrap_or_else(|_| "8081".to_string()));
     let porta: u16 = porta_str.parse().expect("Porta inválida");
 
     let addr = SocketAddr::from(([0, 0, 0, 0], porta));
@@ -431,6 +443,74 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // Criar estado compartilhado
     let state = Arc::new(AppState::new());
     
+    // URL do Receiver (Cloud): argumento 2 ou env RECEIVER_URL ou default
+    let receiver_url = args.get(2)
+        .cloned()
+        .unwrap_or_else(|| env::var("RECEIVER_URL").unwrap_or_else(|_| "http://localhost:8082/receber".to_string()));
+
+    // Ambiente: argumento 3 ou env AMBIENTE ou Fog
+    let ambiente = args.get(3)
+        .cloned()
+        .unwrap_or_else(|| env::var("AMBIENTE").unwrap_or_else(|_| "Fog".to_string()));
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], porta));
+    
+    // Criar estado compartilhado
+    let state = Arc::new(AppState::new());
+    
+    // Tarefa em segundo plano para envio periódico ao Receiver
+    let state_clone = state.clone();
+    let receiver_url_clone = receiver_url.clone();
+    let ambiente_clone = ambiente.clone();
+    tokio::spawn(async move {
+        let client = reqwest::Client::new();
+        let interval = tokio::time::Duration::from_secs(30);
+        
+        loop {
+            tokio::time::sleep(interval).await;
+            
+            let (rle_result, compressed, original_count, compressed_count) = state_clone.get_rle_result();
+            
+            if !rle_result.is_empty() {
+                let reduction_val = if original_count > 0 {
+                    (1.0 - (compressed_count as f64 / original_count as f64)) * 100.0
+                } else {
+                    0.0
+                };
+                
+                let payload = RLEPayload {
+                    rle_data: rle_result,
+                    compressed_string: compressed,
+                    original_count,
+                    compressed_count,
+                    reduction: format!("{:.2}%", reduction_val),
+                };
+
+                println!("📤 {} [Fog]: Enviando dados RLE para o Receiver...", ambiente_clone);
+                let res: Result<reqwest::Response, reqwest::Error> = client.post(&receiver_url_clone)
+                    .json(&payload)
+                    .send()
+                    .await;
+
+                match res {
+                    Ok(resp) => {
+                        if resp.status().is_success() {
+                            println!("✅ Dados enviados com sucesso. Limpando armazenamento local...");
+                            state_clone.reset();
+                        } else {
+                            eprintln!("⚠️ Erro na resposta: {}", resp.status());
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("❌ Falha ao conectar: {}", e);
+                    }
+                }
+            } else {
+                println!("⏳ Fog [{}]: Sem dados para enviar neste ciclo.", ambiente_clone);
+            }
+        }
+    });
+
     let make_svc = make_service_fn(move |_| {
         let state = state.clone();
         async move {
@@ -442,9 +522,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     });
 
     println!("==========================================");
-    println!("🚀 Servidor Fog rodando na porta {}", porta);
-    println!("📊 Implementação kNN + RLE baseada no artigo");
-    println!("✅ SEM USO DE UNSAFE - Apenas Mutex para concorrência");
+    println!("🚀 Filtro rodando na porta {}", porta);
+    println!("🌍 Ambiente: {}", ambiente);
+    println!("☁️  Receiver alvo: {}", receiver_url);
+    println!("⏱️  Ciclo de envio: 30 segundos");
     println!("==========================================");
     println!("Endpoints:");
     println!("  POST /inserir     - Recebe dados dos sensores");
