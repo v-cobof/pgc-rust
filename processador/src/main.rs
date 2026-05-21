@@ -4,9 +4,8 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::collections::HashMap;
 use std::env;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
-use chrono::{Local, Utc};
 
 // Estrutura para dados recebidos dos sensores
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -52,6 +51,52 @@ struct RLEPayload {
     original_count: usize,
     compressed_count: usize,
     reduction: String,
+}
+
+// Estrutura auxiliar para calcular o tamanho_original_bytes (Opção B)
+#[derive(Debug, Serialize, Clone)]
+struct TempHum {
+    temperature: f32,
+    humidity: f32,
+}
+
+// Estruturas para a exportação de estatísticas
+#[derive(Debug, Serialize, Clone)]
+struct Metadados {
+    total_registros: usize,
+    knn_k: usize,
+    timestamp_processamento: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+struct EstatisticasGlobais {
+    tamanho_original_bytes: usize,
+    tamanho_knn_bytes: usize,
+    tamanho_knn_rle_bytes: usize,
+    taxa_compressao_knn_percent: f64,
+    taxa_compressao_knn_rle_percent: f64,
+}
+
+#[derive(Debug, Serialize, Clone)]
+struct LoteOutput {
+    lote_id: usize,
+    timestamp: String,
+    registros_originais: usize,
+    tamanho_original_bytes: usize,
+    sequencia_categorias: Vec<String>,
+    rle_segments: Vec<(String, u32)>,
+    tamanho_knn_bytes: usize,
+    tamanho_knn_rle_bytes: usize,
+    taxa_compressao_knn: f64,
+    taxa_compressao_knn_rle: f64,
+}
+
+#[derive(Debug, Serialize, Clone)]
+struct RelatorioEstatisticas {
+    metadados: Metadados,
+    estatisticas_globais: EstatisticasGlobais,
+    series_temporais: Vec<LoteOutput>,
+    contagem_categorias: HashMap<String, u32>,
 }
 
 // Estado compartilhado da aplicação
@@ -179,18 +224,18 @@ impl AppState {
     
     fn get_category_code(category_name: &str) -> &str {
         match category_name {
-            "Critical dry" => "CD",
-            "Lower fail" => "LF",
-            "Marginal" => "MA",
-            "Upper Fail" => "UF",
-            "Cold and Humid" => "CH",
-            "Lower optimal" => "LO",
-            "Optimal" => "OP",
-            "Upper Optimal" => "UO",
-            "Upper Marginal" => "UM",
-            "Upper Fail (high hum)" => "UH",
-            "Critical" => "CR",
-            _ => "??",
+            "Critical dry" => "D",
+            "Lower fail" => "F",
+            "Marginal" => "M",
+            "Upper Fail" => "U",
+            "Cold and Humid" => "H",
+            "Lower optimal" => "L",
+            "Optimal" => "O",
+            "Upper Optimal" => "P",
+            "Upper Marginal" => "G",
+            "Upper Fail (high hum)" => "I",
+            "Critical" => "R",
+            _ => "?",
         }
     }   
 
@@ -243,6 +288,44 @@ impl AppState {
     // Obter dados classificados
     fn get_classified_data(&self) -> Vec<ClassifiedData> {
         self.classified_data.lock().unwrap().clone()
+    }
+
+    // Obter estatísticas de compressão em bytes (redução real)
+    fn get_byte_compression_metrics(&self) -> Option<(usize, usize, usize, f64, f64)> {
+        let classified_data = self.classified_data.lock().unwrap();
+        if classified_data.is_empty() {
+            return None;
+        }
+        
+        let vec_temp_hum: Vec<TempHum> = classified_data.iter()
+            .map(|c| TempHum { temperature: c.temperature, humidity: c.humidity })
+            .collect();
+        let serialized_original = serde_json::to_string(&vec_temp_hum).unwrap_or_default();
+        let tamanho_original_bytes = serialized_original.len();
+        
+        let sequencia_categorias: Vec<String> = classified_data.iter()
+            .map(|c| Self::get_category_code(&c.category_name).to_string())
+            .collect();
+        let string_knn = sequencia_categorias.join("");
+        let tamanho_knn_bytes = string_knn.len();
+        
+        let rle_result = self.apply_rle(&classified_data);
+        let string_knn_rle = self.rle_to_string(&rle_result);
+        let tamanho_knn_rle_bytes = string_knn_rle.len();
+        
+        let taxa_compressao_knn = if tamanho_original_bytes > 0 {
+            (1.0 - (tamanho_knn_bytes as f64 / tamanho_original_bytes as f64)) * 100.0
+        } else {
+            0.0
+        };
+        
+        let taxa_compressao_knn_rle = if tamanho_original_bytes > 0 {
+            (1.0 - (tamanho_knn_rle_bytes as f64 / tamanho_original_bytes as f64)) * 100.0
+        } else {
+            0.0
+        };
+        
+        Some((tamanho_original_bytes, tamanho_knn_bytes, tamanho_knn_rle_bytes, taxa_compressao_knn, taxa_compressao_knn_rle))
     }
     
     // Aplicar RLE e retornar resultado
@@ -308,6 +391,174 @@ impl AppState {
             }
         })
     }
+}
+
+fn get_estatisticas(relatorio: &RelatorioEstatisticas) -> String {
+    serde_json::to_string_pretty(relatorio).unwrap_or_default()
+}
+
+fn export_para_json(relatorio: &RelatorioEstatisticas, caminho_arquivo: &str) -> std::io::Result<()> {
+    use std::fs::File;
+    use std::io::Write;
+    let json_str = get_estatisticas(relatorio);
+    let mut file = File::create(caminho_arquivo)?;
+    file.write_all(json_str.as_bytes())?;
+    Ok(())
+}
+
+#[derive(Debug, Deserialize)]
+struct CsvRecord {
+    temperatura: f32,
+    umidade: f32,
+}
+
+fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    println!("📖 Carregando dados de {}...", csv_path);
+    
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path(csv_path)?;
+        
+    let records: Vec<CsvRecord> = reader.deserialize()
+        .collect::<Result<Vec<CsvRecord>, csv::Error>>()?;
+        
+    println!("✅ {} registros carregados do CSV.", records.len());
+    
+    let mut series_temporais = Vec::new();
+    let mut contagem_categorias = HashMap::new();
+    let categorias_validas = vec!["D", "F", "M", "U", "H", "L", "O", "P", "G", "I", "R"];
+    for cat in &categorias_validas {
+        contagem_categorias.insert(cat.to_string(), 0);
+    }
+    
+    let mut global_tamanho_original = 0;
+    let mut global_tamanho_knn = 0;
+    let mut global_tamanho_knn_rle = 0;
+    
+    let total_registros = records.len();
+    
+    for (i, lote_records) in records.chunks(6).enumerate() {
+        let lote_id = i + 1;
+        let registros_originais = lote_records.len();
+        
+        let mut lote_temp_hum = Vec::new();
+        let mut lote_classified_data = Vec::new();
+        
+        for record in lote_records {
+            lote_temp_hum.push(TempHum {
+                temperature: record.temperatura,
+                humidity: record.umidade,
+            });
+            
+            let (category_id, category_name) = state.knn_classify(record.temperatura, record.umidade, 3);
+            lote_classified_data.push(ClassifiedData {
+                category: category_id,
+                category_name: category_name.clone(),
+                temperature: record.temperatura,
+                humidity: record.umidade,
+                timestamp: 0,
+            });
+        }
+        
+        let serialized_original = serde_json::to_string(&lote_temp_hum)?;
+        let tamanho_original_bytes = serialized_original.len();
+        global_tamanho_original += tamanho_original_bytes;
+        
+        let sequencia_categorias: Vec<String> = lote_classified_data.iter()
+            .map(|c| AppState::get_category_code(&c.category_name).to_string())
+            .collect();
+            
+        for sigla in &sequencia_categorias {
+            *contagem_categorias.entry(sigla.clone()).or_insert(0) += 1;
+        }
+        
+        let string_knn = sequencia_categorias.join("");
+        let tamanho_knn_bytes = string_knn.len();
+        global_tamanho_knn += tamanho_knn_bytes;
+        
+        let rle_result = state.apply_rle(&lote_classified_data);
+        
+        let rle_segments: Vec<(String, u32)> = rle_result.iter()
+            .map(|rle| (AppState::get_category_code(&rle.category_name).to_string(), rle.quantity))
+            .collect();
+            
+        let string_knn_rle = state.rle_to_string(&rle_result);
+        let tamanho_knn_rle_bytes = string_knn_rle.len();
+        global_tamanho_knn_rle += tamanho_knn_rle_bytes;
+        
+        let taxa_compressao_knn = if tamanho_original_bytes > 0 {
+            (1.0 - (tamanho_knn_bytes as f64 / tamanho_original_bytes as f64)) * 100.0
+        } else {
+            0.0
+        };
+        
+        let taxa_compressao_knn_rle = if tamanho_original_bytes > 0 {
+            (1.0 - (tamanho_knn_rle_bytes as f64 / tamanho_original_bytes as f64)) * 100.0
+        } else {
+            0.0
+        };
+        
+        let timestamp_lote = chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string();
+        
+        series_temporais.push(LoteOutput {
+            lote_id,
+            timestamp: timestamp_lote,
+            registros_originais,
+            tamanho_original_bytes,
+            sequencia_categorias,
+            rle_segments,
+            tamanho_knn_bytes,
+            tamanho_knn_rle_bytes,
+            taxa_compressao_knn,
+            taxa_compressao_knn_rle,
+        });
+    }
+    
+    let taxa_compressao_knn_percent = if global_tamanho_original > 0 {
+        (1.0 - (global_tamanho_knn as f64 / global_tamanho_original as f64)) * 100.0
+    } else {
+        0.0
+    };
+    
+    let taxa_compressao_knn_rle_percent = if global_tamanho_original > 0 {
+        (1.0 - (global_tamanho_knn_rle as f64 / global_tamanho_original as f64)) * 100.0
+    } else {
+        0.0
+    };
+    
+    let estatisticas_globais = EstatisticasGlobais {
+        tamanho_original_bytes: global_tamanho_original,
+        tamanho_knn_bytes: global_tamanho_knn,
+        tamanho_knn_rle_bytes: global_tamanho_knn_rle,
+        taxa_compressao_knn_percent,
+        taxa_compressao_knn_rle_percent,
+    };
+    
+    let metadados = Metadados {
+        total_registros,
+        knn_k: 3,
+        timestamp_processamento: chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string(),
+    };
+    
+    let relatorio = RelatorioEstatisticas {
+        metadados,
+        estatisticas_globais,
+        series_temporais,
+        contagem_categorias,
+    };
+    
+    export_para_json(&relatorio, output_path)?;
+    
+    println!("==========================================");
+    println!("📊 Relatório de Processamento em Lote Gerado!");
+    println!("📁 Arquivo salvo em: {}", output_path);
+    println!("📈 Total de registros processados: {}", total_registros);
+    println!("📦 Tamanho original acumulado: {} bytes", global_tamanho_original);
+    println!("🏷️  Tamanho após kNN: {} bytes (Redução: {:.2}%)", global_tamanho_knn, taxa_compressao_knn_percent);
+    println!("🗜️  Tamanho após kNN+RLE: {} bytes (Redução: {:.2}%)", global_tamanho_knn_rle, taxa_compressao_knn_rle_percent);
+    println!("==========================================");
+    
+    Ok(())
 }
 
 async fn handle_request(
@@ -378,8 +629,8 @@ async fn handle_request(
                 return Ok(response_build(&serde_json::json!({"error": "Sem dados para compressão"}).to_string()));
             }
             
-            let reduction = if original_count > 0 {
-                (1.0 - (compressed_count as f64 / original_count as f64)) * 100.0
+            let reduction = if let Some((_, _, _, _, taxa_rle)) = state.get_byte_compression_metrics() {
+                taxa_rle
             } else {
                 0.0
             };
@@ -433,6 +684,16 @@ fn response_build(body: &str) -> Response<Body> {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args: Vec<String> = env::args().collect();
+    
+    // Se o argumento 1 for "batch", executa em lote offline e encerra
+    if args.get(1).map(|s| s.as_str()) == Some("batch") {
+        let csv_path = args.get(2).map(|s| s.as_str()).unwrap_or("entrada.csv");
+        let output_path = args.get(3).map(|s| s.as_str()).unwrap_or("estatisticas_compressao.json");
+        let state = AppState::new();
+        run_batch_mode(csv_path, output_path, &state)?;
+        return Ok(());
+    }
+
     let porta_str = args.get(1)
         .cloned()
         .unwrap_or_else(|| env::var("PORTA").unwrap_or_else(|_| "8081".to_string()));
@@ -452,11 +713,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let ambiente = args.get(3)
         .cloned()
         .unwrap_or_else(|| env::var("AMBIENTE").unwrap_or_else(|_| "Fog".to_string()));
-
-    let addr = SocketAddr::from(([0, 0, 0, 0], porta));
-    
-    // Criar estado compartilhado
-    let state = Arc::new(AppState::new());
     
     // Tarefa em segundo plano para envio periódico ao Receiver
     let state_clone = state.clone();
@@ -472,8 +728,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             let (rle_result, compressed, original_count, compressed_count) = state_clone.get_rle_result();
             
             if !rle_result.is_empty() {
-                let reduction_val = if original_count > 0 {
-                    (1.0 - (compressed_count as f64 / original_count as f64)) * 100.0
+                let reduction_val = if let Some((_, _, _, _, taxa_rle)) = state_clone.get_byte_compression_metrics() {
+                    taxa_rle
                 } else {
                     0.0
                 };

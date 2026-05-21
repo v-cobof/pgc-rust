@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # Script de inicialização do ecossistema PGC-Rust
-# Uso: ./start_all.sh [1|2|3]
+# Uso: ./start_all.sh [1|2|3|4]
 
 MODE=$1
 
 if [ -z "$MODE" ]; then
-    echo "Uso: ./start_all.sh [1|2|3]"
+    echo "Uso: ./start_all.sh [1|2|3|4]"
     echo "1: Simulador(T) -> LoRa(F) -> Processador(F) -> Receiver(C)"
     echo "2: Simulador(T) -> Processador(T) -> LoRa(F) -> Receiver(C)"
     echo "3: Simulador(T) -> LoRa(F) -> Processador(C) -> Receiver(C)"
+    echo "4: Processador em Lote (Batch Offline) -> Lê entrada.csv e exporta estatisticas_compressao.json"
     exit 1
 fi
 
@@ -87,6 +88,11 @@ case $MODE in
         
         # Simulador no Thing
         wt.exe -w 0 nt wsl.exe --cd "$PWD" bash -c "wasmedge --dir . simulador/target/wasm32-wasip1/debug/simulador.wasm http://localhost:8080/inserir Thing; exec bash"
+        ;;
+    4)
+        echo "Configuração 4: Processamento Offline em Lote (Batch Mode)"
+        # Executa o processador em modo batch para ler entrada.csv e exportar o JSON
+        wasmedge --dir . processador/target/wasm32-wasip1/debug/processador.wasm batch entrada.csv estatisticas_compressao.json
         ;;
     *)
         echo "Modo inválido: $MODE"
