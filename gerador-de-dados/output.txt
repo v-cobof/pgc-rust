@@ -1,0 +1,77 @@
+(venv) PS C:\repos\pgc-rust\gerador-de-dados> python .\gerar_dados_sinteticos.py
+1. Carregando dados...
+✅ Dados carregados: 44023 linhas
+
+Primeiras 5 linhas:
+   temperatura    umidade
+0    18.400000  61.599998
+1    18.400000  57.000000
+2    18.200001  56.400002
+3    18.200001  56.000000
+4    18.000000  59.000000
+
+2. Analisando distribuição original...
+
+Estatísticas descritivas:
+        temperatura       umidade
+count  44023.000000  44023.000000
+mean      18.936669     55.808816
+std        5.474730     18.569870
+min        6.400000     12.100000
+25%       14.900000     42.000000
+50%       18.200001     57.599998
+75%       23.000000     70.699997
+max       31.900000     92.199997
+temperatura: p-valor do teste de normalidade = 0.000000
+  → Não é normal (use KDE)
+umidade: p-valor do teste de normalidade = 0.000000
+  → Não é normal (use KDE)
+
+3. Treinando modelo KDE...
+✅ Modelo KDE treinado (bandwidth = 0.5)
+
+4. Gerando dados sintéticos...
+✅ Geradas 40000 linhas sintéticas
+
+5. Teste KS (Kolmogorov-Smirnov)...
+(Quanto maior o p-valor > 0.05, mais similares as distribuições)
+
+temperatura:
+  KS statistic: 0.0086
+  p-valor: 0.0885
+  ✅ Distribuições similares (p > 0.05)
+
+umidade:
+  KS statistic: 0.0037
+  p-valor: 0.9405
+  ✅ Distribuições similares (p > 0.05)
+
+6. Comparando correlação entre variáveis...
+Correlação original: -0.8837
+Correlação sintética: -0.8803
+Diferença: 0.0034
+
+7. Gerando gráficos...
+C:\repos\pgc-rust\gerador-de-dados\venv\Lib\site-packages\seaborn\distributions.py:1176: UserWarning: The following kwargs were not used by contour: 'linestyle'
+  cset = contour_func(
+C:\repos\pgc-rust\gerador-de-dados\gerar_dados_sinteticos.py:150: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  ax6.legend()
+
+✅ Gráfico salvo como 'comparacao_dados.png'
+
+8. Salvando dados sintéticos...
+✅ Arquivo salvo como 'dados_sinteticos.csv'
+
+==================================================
+RESUMO FINAL
+==================================================
+✅ Dados originais: 44023 linhas
+✅ Dados sintéticos: 40000 linhas
+
+Teste KS (p-valor):
+  temperatura: 0.0885
+  umidade: 0.9405
+
+Diferença de correlação: 0.0034
+
+✨ Processo concluído com sucesso!

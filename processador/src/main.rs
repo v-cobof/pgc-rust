@@ -245,6 +245,35 @@ impl AppState {
             .collect::<Vec<String>>()
             .join("")
     }
+
+    // Fazer RLE em uma string de códigos (ex.: "OOOPPPGGG") -> "3O3P3G"
+    fn rle_codes_string(codes: &str) -> String {
+        if codes.is_empty() {
+            return String::new();
+        }
+
+        let mut result = String::new();
+        let mut chars = codes.chars();
+        let mut current = match chars.next() {
+            Some(c) => c,
+            None => return result,
+        };
+        let mut count: usize = 1;
+
+        for c in chars {
+            if c == current {
+                count += 1;
+            } else {
+                result.push_str(&format!("{}{}", count, current));
+                current = c;
+                count = 1;
+            }
+        }
+
+        // último grupo
+        result.push_str(&format!("{}{}", count, current));
+        result
+    }
     
     // Resetar todos os dados
     fn reset(&self) {
@@ -412,7 +441,7 @@ struct CsvRecord {
     umidade: f32,
 }
 
-fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rle: bool) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     println!("📖 Carregando dados de {}...", csv_path);
     
     let mut reader = csv::ReaderBuilder::new()
@@ -434,6 +463,7 @@ fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState) -> Result
     let mut global_tamanho_original = 0;
     let mut global_tamanho_knn = 0;
     let mut global_tamanho_knn_rle = 0;
+    let mut global_string_knn = String::new();
     
     let total_registros = records.len();
     
@@ -475,6 +505,9 @@ fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState) -> Result
         let string_knn = sequencia_categorias.join("");
         let tamanho_knn_bytes = string_knn.len();
         global_tamanho_knn += tamanho_knn_bytes;
+        if global_rle {
+            global_string_knn.push_str(&string_knn);
+        }
         
         let rle_result = state.apply_rle(&lote_classified_data);
         
@@ -519,7 +552,13 @@ fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState) -> Result
     } else {
         0.0
     };
-    
+
+    // Se solicitado, calcule o RLE sobre a cadeia global concatenada (maximizar impacto do RLE)
+    if global_rle {
+        let global_rle_string = AppState::rle_codes_string(&global_string_knn);
+        global_tamanho_knn_rle = global_rle_string.len();
+    }
+
     let taxa_compressao_knn_rle_percent = if global_tamanho_original > 0 {
         (1.0 - (global_tamanho_knn_rle as f64 / global_tamanho_original as f64)) * 100.0
     } else {
@@ -689,8 +728,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     if args.get(1).map(|s| s.as_str()) == Some("batch") {
         let csv_path = args.get(2).map(|s| s.as_str()).unwrap_or("entrada.csv");
         let output_path = args.get(3).map(|s| s.as_str()).unwrap_or("estatisticas_compressao.json");
+        // Detectar flag --global-rle em qualquer posição dos args
+        let use_global_rle = args.iter().any(|s| s == "--global-rle");
         let state = AppState::new();
-        run_batch_mode(csv_path, output_path, &state)?;
+        run_batch_mode(csv_path, output_path, &state, use_global_rle)?;
         return Ok(());
     }
 
