@@ -91,8 +91,8 @@ case $MODE in
         ;;
     4)
         echo "Configuração 4: Processamento Offline em Lote (Batch Mode)"
-        # Executa o processador em modo batch para ler entrada.csv e exportar o JSON
-        wasmedge --dir . processador/target/wasm32-wasip1/debug/processador.wasm batch entrada.csv estatisticas_compressao.json
+        # Executa o processador em modo batch para ler entrada.csv e exportar o JSON (passando flags extras se existirem)
+        wasmedge --dir . processador/target/wasm32-wasip1/debug/processador.wasm batch entrada.csv estatisticas_compressao.json "$2" "$3"
         ;;
     *)
         echo "Modo inválido: $MODE"

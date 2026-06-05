@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
+use rand::Rng;
 
 // Estrutura para dados recebidos dos sensores
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -441,17 +442,62 @@ struct CsvRecord {
     umidade: f32,
 }
 
-fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rle: bool) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    println!("📖 Carregando dados de {}...", csv_path);
+fn next_gaussian<R: rand::Rng>(rng: &mut R) -> f32 {
+    let mut u1: f32 = rng.gen_range(0.0..1.0);
+    while u1 <= 0.0 {
+        u1 = rng.gen_range(0.0..1.0);
+    }
+    let u2: f32 = rng.gen_range(0.0..1.0);
+    (-2.0 * u1.ln()).sqrt() * (2.0 * std::f32::consts::PI * u2).cos()
+}
+
+fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rle: bool, use_synthetic: bool) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    println!("📖 Carregando dados base de {}...", csv_path);
     
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(true)
         .from_path(csv_path)?;
         
-    let records: Vec<CsvRecord> = reader.deserialize()
+    let mut records: Vec<CsvRecord> = reader.deserialize()
         .collect::<Result<Vec<CsvRecord>, csv::Error>>()?;
         
-    println!("✅ {} registros carregados do CSV.", records.len());
+    println!("✅ {} registros carregados do CSV base.", records.len());
+    
+    if use_synthetic {
+        println!("🎲 Gerando 40000 registros sintéticos usando KDE (bandwidth = 0.5)...");
+        if records.is_empty() {
+            return Err("Não há registros no CSV base para gerar dados sintéticos.".into());
+        }
+        
+        let mut rng = rand::thread_rng();
+        let mut synthetic_records = Vec::with_capacity(40000);
+        
+        for _ in 0..40000 {
+            let idx = rng.gen_range(0..records.len());
+            let base = &records[idx];
+            
+            let temp_noise = next_gaussian(&mut rng) * 0.5;
+            let hum_noise = next_gaussian(&mut rng) * 0.5;
+            
+            synthetic_records.push(CsvRecord {
+                temperatura: base.temperatura + temp_noise,
+                umidade: base.umidade + hum_noise,
+            });
+        }
+        
+        println!("💾 Salvando dados sintéticos gerados em 'dados_sinteticos_gerados_rust.csv'...");
+        let mut wtr = csv::WriterBuilder::new()
+            .has_headers(true)
+            .from_path("dados_sinteticos_gerados_rust.csv")?;
+        wtr.write_record(&["temperatura", "umidade"])?;
+        for r in &synthetic_records {
+            wtr.write_record(&[r.temperatura.to_string(), r.umidade.to_string()])?;
+        }
+        wtr.flush()?;
+        println!("✅ Arquivo 'dados_sinteticos_gerados_rust.csv' salvo com sucesso.");
+        
+        records = synthetic_records;
+    }
     
     let mut series_temporais = Vec::new();
     let mut contagem_categorias = HashMap::new();
@@ -726,12 +772,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     
     // Se o argumento 1 for "batch", executa em lote offline e encerra
     if args.get(1).map(|s| s.as_str()) == Some("batch") {
-        let csv_path = args.get(2).map(|s| s.as_str()).unwrap_or("entrada.csv");
-        let output_path = args.get(3).map(|s| s.as_str()).unwrap_or("estatisticas_compressao.json");
-        // Detectar flag --global-rle em qualquer posição dos args
+        // Obter argumentos posicionais que não sejam flags (não começam com "--")
+        let positional_args: Vec<&str> = args.iter().skip(2)
+            .map(|s| s.as_str())
+            .filter(|s| !s.starts_with("--"))
+            .collect();
+            
+        let csv_path = positional_args.get(0).cloned().unwrap_or("entrada.csv");
+        let output_path = positional_args.get(1).cloned().unwrap_or("estatisticas_compressao.json");
+        
         let use_global_rle = args.iter().any(|s| s == "--global-rle");
+        let use_synthetic = args.iter().any(|s| s == "--synthetic" || s == "--sintetico");
+        
         let state = AppState::new();
-        run_batch_mode(csv_path, output_path, &state, use_global_rle)?;
+        run_batch_mode(csv_path, output_path, &state, use_global_rle, use_synthetic)?;
         return Ok(());
     }
 

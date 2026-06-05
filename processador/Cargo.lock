@@ -556,6 +556,7 @@ dependencies = [
  "chrono",
  "csv",
  "hyper_wasi",
+ "rand",
  "reqwest_wasi",
  "serde",
  "serde_json",
