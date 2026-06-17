@@ -451,7 +451,7 @@ fn next_gaussian<R: rand::Rng>(rng: &mut R) -> f32 {
     (-2.0 * u1.ln()).sqrt() * (2.0 * std::f32::consts::PI * u2).cos()
 }
 
-fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rle: bool, use_synthetic: bool) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rle: bool, use_synthetic: bool, lote_tamanho: usize) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     println!("📖 Carregando dados base de {}...", csv_path);
     
     let mut reader = csv::ReaderBuilder::new()
@@ -513,7 +513,7 @@ fn run_batch_mode(csv_path: &str, output_path: &str, state: &AppState, global_rl
     
     let total_registros = records.len();
     
-    for (i, lote_records) in records.chunks(6).enumerate() {
+    for (i, lote_records) in records.chunks(lote_tamanho).enumerate() {
         let lote_id = i + 1;
         let registros_originais = lote_records.len();
         
@@ -784,8 +784,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let use_global_rle = args.iter().any(|s| s == "--global-rle");
         let use_synthetic = args.iter().any(|s| s == "--synthetic" || s == "--sintetico");
         
+        let lote_tamanho = args.iter()
+            .position(|s| s == "--tamanho-pacote" || s == "--lote-tamanho")
+            .and_then(|pos| args.get(pos + 1))
+            .and_then(|val| val.parse::<usize>().ok())
+            .unwrap_or(6);
+        
         let state = AppState::new();
-        run_batch_mode(csv_path, output_path, &state, use_global_rle, use_synthetic)?;
+        run_batch_mode(csv_path, output_path, &state, use_global_rle, use_synthetic, lote_tamanho)?;
         return Ok(());
     }
 
