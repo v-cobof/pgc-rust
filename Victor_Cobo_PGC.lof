@@ -1,0 +1,7 @@
+\babel@toc {brazil}{}\relax 
+\babel@toc {brazil}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Esquema lógico do pipeline: Sensor $\to $ Gateway LoRa $\to $ Processador (Névoa kNN+RLE) $\to $ Nuvem}}{24}{figure.caption.13}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Curvas de contorno de densidade de probabilidade bidimensional}}{33}{figure.caption.15}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Correlogramas de Temperatura vs Umidade classificados por kNN (Round 1)}}{35}{figure.caption.16}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Correlogramas de Temperatura vs Umidade classificados por kNN (Round 2)}}{36}{figure.caption.17}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Comparação de Densidade Bidimensional Completa (Original vs Sintético)}}{37}{figure.caption.18}%

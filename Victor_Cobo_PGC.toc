@@ -1,0 +1,88 @@
+\changetocdepth {4}
+\babel@toc {brazil}{}\relax 
+\babel@toc {brazil}{}\relax 
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {1}\MakeTextUppercase []{INTRODUÇÃO}}{11}{chapter.1}%
+\contentsline {section}{\numberline {1.1}PROBLEMA DE PESQUISA}{11}{section.1.1}%
+\contentsline {section}{\numberline {1.2}OBJETIVOS}{12}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Objetivo Geral}{12}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Objetivos Específicos}{12}{subsection.1.2.2}%
+\contentsline {section}{\numberline {1.3}JUSTIFICATIVA}{12}{section.1.3}%
+\contentsline {section}{\numberline {1.4}DISCIPLINAS FORMADORAS DO PROJETO}{13}{section.1.4}%
+\contentsline {section}{\numberline {1.5}ORGANIZAÇÃO DO TEXTO}{14}{section.1.5}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {2}\MakeTextUppercase []{REFERENCIAL TEÓRICO}}{15}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Computação em Névoa (Fog Computing)}{15}{section.2.1}%
+\contentsline {section}{\numberline {2.2}IoT-Cloud Continuum (IoTinuum)}{15}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Rust e WebAssembly (WASM)}{15}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Linguagem Rust}{15}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}WebAssembly (WASM) e WASI}{16}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}WasmEdge Runtime}{16}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Algoritmo dos k-Vizinhos Mais Próximos (kNN)}{16}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Compressão Run Length Encoding (RLE)}{17}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Geração Estocástica via KDE e Box-Muller}{17}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Estimativa de Densidade por Kernel (KDE)}{17}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Transformada de Box-Muller}{18}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}Métodos de Validação Estatística}{18}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Teste de Kolmogorov-Smirnov (KS) de Duas Amostras}{18}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Coeficiente de Correlação de Pearson}{20}{subsection.2.7.2}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {3}\MakeTextUppercase []{REVISÃO DE LITERATURA}}{22}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Trabalho de Base: Ribeiro Junior et al. (2020) - MetroAGriFor 2020}{22}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Avanços Introduzidos pelo Presente Projeto}{22}{section.3.2}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {4}\MakeTextUppercase []{DESENVOLVIMENTO E ARQUITETURA}}{24}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Visão Geral da Arquitetura}{24}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Componentes do Código e Implementação}{25}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Dispositivo IoT (simulador)}{25}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Gateway/Relay LoRa (LoRa)}{25}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Processador na Névoa (processador)}{25}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Receptor na Nuvem (receiver)}{26}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Scripts de Validação e Análise em Python (gerador-de-dados)}{26}{subsection.4.2.5}%
+\contentsline {section}{\numberline {4.3}Fluxos de Execução do Processador}{26}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Modo Normal (Online / Serviço HTTP)}{27}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Modo Lote (Offline / Batch Mode)}{27}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Modo de Geração de Dados Sintéticos}{27}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Outputs e Logs de Execução dos Componentes}{27}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Logs do Modo Normal (Online)}{27}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Logs do Modo Lote (Batch Offline)}{28}{subsection.4.4.2}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {5}\MakeTextUppercase []{METODOLOGIA E CONFIGURAÇÃO EXPERIMENTAL}}{30}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Ambiente de Execução Experimental}{30}{section.5.1}%
+\contentsline {section}{\numberline {5.2}O Dataset e o Modelo do Tomateiro}{30}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Configuração dos Experimentos de Compressão}{31}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Planilha de Métricas de Validação}{31}{section.5.4}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{RESULTADOS E DISCUSSÃO}}{32}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Validação Estatística dos Dados Sintéticos}{32}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Análise Visual das Curvas de Densidade e Distribuição}{32}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Resultados da Compressão de Dados nos Experimentos}{38}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Custo de Serialização JSON e o Overhead de Colchetes}{38}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Efeito de Borda e o Lote Ideal}{38}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Consistência entre Execuções Independentes}{39}{subsection.6.3.3}%
+\contentsline {section}{\numberline {6.4}Comparação kNN Puro vs kNN+RLE}{40}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Discussão sobre a Ineficiência do RLE}{40}{subsection.6.4.1}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{CONCLUSÃO}}{42}{chapter.7}%
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\contentsline {chapter}{\MakeTextUppercase []{Refer\^encias}}{43}{section*.25}%
+\renewcommand *{\cftappendixname }{AP\^ENDICE \space }
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{ESTRUTURA DO PROJETO DE SENSORES E NÉVOA}}{44}{chapter.A}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{MODELO DOS DADOS SERIALIZADOS (JSON)}}{45}{chapter.B}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{COMANDOS DE LINHA DE COMANDO (CLI) E ROTEIRO DE EXECUÇÃO}}{46}{chapter.C}%
+\contentsline {subsection}{\numberline {C.0.1}Compilação de cada Componente para WebAssembly}{46}{subsection.C.0.1}%
+\contentsline {subsection}{\numberline {C.0.2}Modo Normal (Fluxo Online de Rede)}{46}{subsection.C.0.2}%
+\contentsline {subsection}{\numberline {C.0.3}Modo Lote (Offline / Batch Mode)}{47}{subsection.C.0.3}%

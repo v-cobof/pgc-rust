@@ -1,0 +1,67 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.7 }
+
+\bibitem[Adelantado et al. 2017]{adelantado2017lorawan}
+\abntrefinfo{Adelantado et al.}{ADELANTADO et al.}{2017}
+{ADELANTADO, F. et al. Understanding the limits of lorawan.
+\emph{IEEE Communications Magazine}, IEEE, v.~55, n.~9, p. 34--40, 2017.}
+
+\bibitem[Box e Muller 1958]{box1958muller}
+\abntrefinfo{Box e Muller}{BOX; MULLER}{1958}
+{BOX, G. E.~P.; MULLER, M.~E. A note on the generation of random normal
+  deviates.
+\emph{The Annals of Mathematical Statistics}, JSTOR, v.~29, n.~2, p. 610--611,
+  1958.}
+
+\bibitem[Haas et al. 2017]{haas2017wasm}
+\abntrefinfo{Haas et al.}{HAAS et al.}{2017}
+{HAAS, A. et al. Bringing the web up to speed with webassembly. In:
+  \emph{Proceedings of the ACM SIGPLAN Conference on Programming Language
+  Design and Implementation (PLDI)}. Barcelona, Spain: ACM, 2017. p. 185--200.}
+
+\bibitem[Junior et al. 2020]{ribeiro2020nearest}
+\abntrefinfo{Junior et al.}{JUNIOR et al.}{2020}
+{JUNIOR, L. A.~S. R. et al. A nearest neighbors based data filter for fog
+  computing in iot smart agriculture. In:  \emph{Proceedings of the IEEE
+  International Workshop on Metrology for Agriculture and Forestry
+  (MetroAgriFor)}. Trento, Italy: IEEE, 2020. p. 194--198.}
+
+\bibitem[Kamienski et al. 2018]{kamienski2017iotinuum}
+\abntrefinfo{Kamienski et al.}{KAMIENSKI et al.}{2018}
+{KAMIENSKI, C.~A. et al. Orquestra{\c{c}}{\~a}o e gerenciamento no
+  cont{\'\i}nuo nuvem-n{\'e}voa-coisas para a agricultura inteligente. In:
+  \emph{Anais do Workshop de Computa{\c{c}}{\~a}o em Nuvem e N{\'e}voa (WCF)}.
+  Porto Alegre, Brasil: SBC, 2018. p.~1--8.}
+
+\bibitem[Massey 1951]{massey1951ks}
+\abntrefinfo{Massey}{MASSEY}{1951}
+{MASSEY, F.~J. The kolmogorov-smirnov test for goodness of fit.
+\emph{Journal of the American Statistical Association}, Taylor \& Francis,
+  v.~46, n.~253, p. 68--78, 1951.}
+
+\bibitem[Matsakis e II 2014]{matsakis2014rust}
+\abntrefinfo{Matsakis e II}{MATSAKIS; II}{2014}
+{MATSAKIS, N.~D.; II, F.~S. K. The rust language.
+\emph{ACM SIGAda Ada Letters}, ACM, v.~34, n.~3, p. 103--104, 2014.}
+
+\bibitem[Pearson 1895]{pearson1895}
+\abntrefinfo{Pearson}{PEARSON}{1895}
+{PEARSON, K. Note on regression and inheritance in the case of two parents.
+\emph{Proceedings of the Royal Society of London}, v.~58, p. 240--242, 1895.}
+
+\bibitem[Silverman 1986]{silverman1986kde}
+\abntrefinfo{Silverman}{SILVERMAN}{1986}
+{SILVERMAN, B.~W. \emph{Density Estimation for Statistics and Data Analysis}.
+  London: Chapman \& Hall, 1986.}
+
+\bibitem[{WasmEdge Runtime} 2023]{wasmedge2023}
+\abntrefinfo{{WasmEdge Runtime}}{{WasmEdge Runtime}}{2023}
+{{WasmEdge Runtime}. \emph{CNCF WasmEdge}.
+[S.l.], 2023. Acesso em: junho 2026. Dispon{\'\i}vel em:
+  \url{https://wasmedge.org}.}
+
+\end{thebibliography}

@@ -6,7 +6,12 @@ use std::env;
 use serde::{Deserialize, Serialize};
 use reqwest::Client;
 
-// Estrutura para dados recebidos dos sensores (Deve ser idêntica ao do processador)
+// ==============================================================================
+// ESTRUTURAS DE DADOS
+// ==============================================================================
+
+// Estrutura para os dados brutos recebidos dos sensores.
+// Deve ser mantida idêntica à do processador e simulador.
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct SensorData {
     temperature: f32,
@@ -14,9 +19,7 @@ struct SensorData {
     timestamp: u64,
 }
 
-// A URL do processador será definida via argumento CLI
-
-// Estruturas para os dados RLE (Comprimido)
+// Estrutura para os payloads de dados compactados RLE.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct RLEPayload {
     rle_data: Vec<RLEOutput>,
@@ -26,22 +29,30 @@ struct RLEPayload {
     reduction: String,
 }
 
+// Representação de categorias comprimidas individuais.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct RLEOutput {
     category_name: String,
     quantity: u32,
 }
 
+// ==============================================================================
+// HANDLER DE REQUISIÇÕES (LÓGICA DE PROXY/RETRAMISSÃO)
+// ==============================================================================
+// O Gateway LoRa atua como uma ponte de comunicação de rede,
+// recebendo e retransmitindo pacotes.
 async fn handle_request(
     req: Request<Body>,
     client: Client,
     processor_url: String,
 ) -> Result<Response<Body>, anyhow::Error> {
     match (req.method(), req.uri().path()) {
+        // Rota GET /: Fornece informações sobre as rotas disponíveis
         (&Method::GET, "/") => Ok(Response::new(Body::from(
             "LoRa Relay: Envie dados via /inserir (Normal) ou /receber (RLE)",
         ))),
 
+        // Rota POST /receber: Proxy para retransmitir payloads compactados RLE
         (&Method::POST, "/receber") => {
             println!("📥 LoRa: Recebendo pacote RLE (Comprimido)...");
             let byte_stream = match hyper::body::to_bytes(req).await {
@@ -66,6 +77,7 @@ async fn handle_request(
 
             println!("➡️ LoRa: Retransmitindo pacote RLE para o alvo... (Redução: {})", rle_payload.reduction);
 
+            // Dispara requisição POST encaminhando o payload JSON para o processador alvo
             let response = client.post(&processor_url)
                 .json(&rle_payload)
                 .send()
@@ -88,6 +100,7 @@ async fn handle_request(
             }
         },
 
+        // Rota POST /inserir: Proxy para retransmitir dados normais de sensoriamento contínuo
         (&Method::POST, "/inserir") => {
             println!("📡 LoRa: Recebendo dados do sensor...");
             
@@ -114,7 +127,7 @@ async fn handle_request(
             println!("➡️ Retransmitindo para o processador: {:.1}°C | {:.1}%", 
                      sensor_data.temperature, sensor_data.humidity);
 
-            // Retransmissão usando reqwest_wasi
+            // Retransmite usando o cliente http assíncrono para o processador alvo
             let response = client.post(&processor_url)
                 .json(&sensor_data)
                 .send()
@@ -141,8 +154,10 @@ async fn handle_request(
             }
         },
 
+        // Rota OPTIONS para suporte a solicitações CORS pré-vôo
         (&Method::OPTIONS, _) => Ok(response_build("")),
 
+        // 404 para outras URLs
         _ => {
             let mut not_found = Response::default();
             *not_found.status_mut() = StatusCode::NOT_FOUND;
@@ -151,6 +166,7 @@ async fn handle_request(
     }
 }
 
+// Constrói a resposta Hyper configurando CORS headers
 fn response_build(body: &str) -> Response<Body> {
     Response::builder()
         .header("Access-Control-Allow-Origin", "*")
@@ -161,29 +177,33 @@ fn response_build(body: &str) -> Response<Body> {
         .unwrap()
 }
 
+// ==============================================================================
+// FUNÇÃO PRINCIPAL (ENTRYPOINT)
+// ==============================================================================
+// Inicializa o servidor HTTP do relay LoRa.
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args: Vec<String> = env::args().collect();
     
-    // Porta: argumento 1 ou env PORTA ou 8080
+    // Porta de escuta: Argumento 1, env var PORTA, ou 8080 default
     let porta_str = args.get(1)
         .cloned()
         .unwrap_or_else(|| env::var("PORTA").unwrap_or_else(|_| "8080".to_string()));
     let porta: u16 = porta_str.parse().expect("Porta inválida");
 
-    // URL do Processador: argumento 2 ou env PROCESSOR_URL ou default
+    // URL do Processador/Névoa alvo: Argumento 2, env var PROCESSOR_URL, ou localhost default
     let processor_url = args.get(2)
         .cloned()
         .unwrap_or_else(|| env::var("PROCESSOR_URL").unwrap_or_else(|_| "http://localhost:8081/inserir".to_string()));
 
-    // Ambiente: argumento 3 ou env AMBIENTE ou Fog
+    // Nome do ambiente de execução (Fog/Relay)
     let ambiente = args.get(3)
         .cloned()
         .unwrap_or_else(|| env::var("AMBIENTE").unwrap_or_else(|_| "Fog".to_string()));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], porta));
     
-    // Cliente HTTP para retransmissão
+    // Cliente HTTP reusável para o encaminhamento de pacotes
     let client = Client::new();
     
     let processor_url_clone = processor_url.clone();

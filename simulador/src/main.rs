@@ -1,9 +1,13 @@
-use rand::Rng;
 use tokio::time::{self, Duration, Instant};
 use serde::{Deserialize, Serialize};
 use chrono::Timelike;
 use csv::ReaderBuilder;
 
+// ==============================================================================
+// ESTRUTURAS DE DADOS
+// ==============================================================================
+
+// Estrutura enviada em formato JSON pelo simulador contendo a leitura atual.
 #[derive(Debug, Serialize, Deserialize)]
 struct SensorData {
     temperature: f32,
@@ -11,25 +15,33 @@ struct SensorData {
     timestamp: u64,
 }
 
+// Estrutura auxiliar para mapear as colunas lidas do arquivo 'entrada.csv'.
 #[derive(Debug, Deserialize)]
 struct CsvRecord {
     temperatura: f32,
     umidade: f32,
 }
 
+// ==============================================================================
+// FUNÇÃO PRINCIPAL (ENTRYPOINT)
+// ==============================================================================
+// Executa o loop principal de transmissão simulada em uma thread do Tokio.
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), reqwest::Error> {
+    // Coleta argumentos da linha de comando
     let args: Vec<String> = std::env::args().collect();
+    
+    // URL destino do gateway/névoa: prioritariamente argumento CLI, senão env var, senão localhost default
     let target_url = args.get(1)
         .cloned()
         .unwrap_or_else(|| std::env::var("TARGET_URL").unwrap_or_else(|_| "http://127.0.0.1:8080/inserir".to_string()));
 
-    // Ambiente: argumento 2 ou env AMBIENTE ou Thing
+    // Nome da instância do simulador (Thing)
     let ambiente = args.get(2)
         .cloned()
         .unwrap_or_else(|| std::env::var("AMBIENTE").unwrap_or_else(|_| "Thing".to_string()));
 
-    // Carregar dados de entrada.csv
+    // Carrega a base física real a partir de 'entrada.csv'
     let csv_path = "entrada.csv";
     println!("📖 Carregando dados de {}...", csv_path);
     
@@ -38,6 +50,7 @@ async fn main() -> Result<(), reqwest::Error> {
         .from_path(csv_path)
         .expect("Arquivo entrada.csv não encontrado ou inacessível. Certifique-se de usar --dir . no WasmEdge");
     
+    // Deserializa todos os registros CSV para vetor em memória
     let records: Vec<CsvRecord> = reader.deserialize()
         .collect::<Result<Vec<CsvRecord>, csv::Error>>()
         .expect("Erro ao ler/parsear entrada.csv");
@@ -45,16 +58,18 @@ async fn main() -> Result<(), reqwest::Error> {
     let mut csv_index = 0;
     println!("✅ {} registros carregados do CSV.", records.len());
 
-    let interval = Duration::from_secs(5); // Envia a cada 5 segundos
+    // Configura a frequência de transmissão (a cada 5 segundos)
+    let interval = Duration::from_secs(5); 
     let mut next_time = Instant::now() + interval;
     
     let client = reqwest::Client::new();
-    let mut _rng = rand::thread_rng(); // Prefixo _ para evitar warning de não uso
+    let mut _rng = rand::thread_rng(); // RNG disponível para propósitos gerais
 
     println!("Iniciando simulador de sensores - Usando dados do arquivo CSV...");
     println!("🌍 Ambiente: {}", ambiente);
     println!("Enviando para {} a cada 5 segundos\n", target_url);
 
+    // Loop infinito de sensoriamento contínuo
     loop {
         let hora_atual = chrono::Local::now().hour();
 
@@ -71,7 +86,7 @@ async fn main() -> Result<(), reqwest::Error> {
         let humidity = (humidity * 100.0).round() / 100.0;
         ---------------------------------------------------- */
 
-        // Pegar próximo registro do CSV (Circular)
+        // Seleciona a leitura corrente no CSV usando índice circular
         let record = &records[csv_index];
         let temperature = record.temperatura;
         let humidity = record.umidade;
@@ -88,7 +103,7 @@ async fn main() -> Result<(), reqwest::Error> {
         println!("📊 [Linha CSV {}] Hora: {}h | Temp: {:.1}°C | Umidade: {:.1}%", 
                  csv_index, hora_atual, temperature, humidity);
 
-        // Envia os dados como JSON
+        // Dispara requisição HTTP POST contendo o payload em formato JSON
         let res = client
             .post(&target_url)
             .json(&sensor_data)
@@ -101,7 +116,7 @@ async fn main() -> Result<(), reqwest::Error> {
             println!("❌ Erro no envio: {}", res.status());
         }
 
-        // Aguarda até o próximo envio
+        // Aguarda de forma assíncrona até o próximo ciclo
         time::sleep(next_time - Instant::now()).await;
         next_time += interval;
     }
