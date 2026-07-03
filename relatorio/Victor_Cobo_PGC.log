@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.6.18)  1 JUL 2026 21:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.6.18)  3 JUL 2026 18:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1161,10 +1161,10 @@ Cap\'{\i }tulo 2.
 ] [16] [17] [18] [19{C:/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/enc/dvi
 ps/lm/lm-mathex.enc}] [20] [21] [22] [23] [24] [25]
 Cap\'{\i }tulo 3.
-<esquema_logico.png, id=411, 1005.7575pt x 229.85875pt>
+<esquema_logico.png, id=412, 1005.7575pt x 229.85875pt>
 File: esquema_logico.png Graphic file (type png)
 <use esquema_logico.png>
-Package pdftex.def Info: esquema_logico.png  used on input line 473.
+Package pdftex.def Info: esquema_logico.png  used on input line 475.
 (pdftex.def)             Requested size: 341.43306pt x 78.03168pt.
 [26
 
@@ -1176,77 +1176,77 @@ File: lstlang1.sty 2025/11/14 1.11b listings language file
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 536.
+nput line 538.
 
 [29] [30]
 Cap\'{\i }tulo 4.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 616.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 618.
 [31
 
 ] [32] [33] [34]
 Cap\'{\i }tulo 5.
-<analise-experimentos/densidade_artigo_original.png, id=518, 867.24pt x 361.35p
+<analise-experimentos/densidade_artigo_original.png, id=520, 867.24pt x 361.35p
 t>
 File: analise-experimentos/densidade_artigo_original.png Graphic file (type png
 )
 <use analise-experimentos/densidade_artigo_original.png>
 Package pdftex.def Info: analise-experimentos/densidade_artigo_original.png  us
-ed on input line 706.
+ed on input line 708.
 (pdftex.def)             Requested size: 222.9525pt x 92.89565pt.
-<analise-experimentos/densidade_artigo_sintetico.png, id=519, 867.24pt x 361.35
+<analise-experimentos/densidade_artigo_sintetico.png, id=521, 867.24pt x 361.35
 pt>
 File: analise-experimentos/densidade_artigo_sintetico.png Graphic file (type pn
 g)
 <use analise-experimentos/densidade_artigo_sintetico.png>
 Package pdftex.def Info: analise-experimentos/densidade_artigo_sintetico.png  u
-sed on input line 712.
+sed on input line 714.
 (pdftex.def)             Requested size: 222.9525pt x 92.89565pt.
 [35
 
  <./analise-experimentos/densidade_artigo_original.png> <./analise-experimentos
 /densidade_artigo_sintetico.png>]
-<analise-experimentos/correlograma_r1_original.png, id=530, 601.7682pt x 518.41
+<analise-experimentos/correlograma_r1_original.png, id=532, 601.7682pt x 518.41
 68pt>
 File: analise-experimentos/correlograma_r1_original.png Graphic file (type png)
 
 <use analise-experimentos/correlograma_r1_original.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r1_original.png  use
-d on input line 730.
+d on input line 732.
 (pdftex.def)             Requested size: 222.9525pt x 192.06433pt.
-<analise-experimentos/correlograma_r1_sintetico.png, id=531, 611.4042pt x 518.4
+<analise-experimentos/correlograma_r1_sintetico.png, id=533, 611.4042pt x 518.4
 168pt>
 File: analise-experimentos/correlograma_r1_sintetico.png Graphic file (type png
 )
 <use analise-experimentos/correlograma_r1_sintetico.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r1_sintetico.png  us
-ed on input line 736.
+ed on input line 738.
 (pdftex.def)             Requested size: 222.9525pt x 189.04256pt.
-<analise-experimentos/correlograma_r2_original.png, id=532, 578.16pt x 518.4168
+<analise-experimentos/correlograma_r2_original.png, id=534, 578.16pt x 518.4168
 pt>
 File: analise-experimentos/correlograma_r2_original.png Graphic file (type png)
 
 <use analise-experimentos/correlograma_r2_original.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r2_original.png  use
-d on input line 748.
+d on input line 750.
 (pdftex.def)             Requested size: 222.9525pt x 199.91144pt.
-<analise-experimentos/correlograma_r2_sintetico.png, id=533, 611.4042pt x 518.4
+<analise-experimentos/correlograma_r2_sintetico.png, id=535, 611.4042pt x 518.4
 168pt>
 File: analise-experimentos/correlograma_r2_sintetico.png Graphic file (type png
 )
 <use analise-experimentos/correlograma_r2_sintetico.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r2_sintetico.png  us
-ed on input line 754.
+ed on input line 756.
 (pdftex.def)             Requested size: 222.9525pt x 189.04256pt.
  [36 <./analise-experimentos/correlograma_r1_original.png> <./analise-experimen
 tos/correlograma_r1_sintetico.png>]
-<analise-experimentos/densidade_global_comparacao.png, id=544, 867.24pt x 361.3
+<analise-experimentos/densidade_global_comparacao.png, id=546, 867.24pt x 361.3
 5pt>
 File: analise-experimentos/densidade_global_comparacao.png Graphic file (type p
 ng)
 <use analise-experimentos/densidade_global_comparacao.png>
 Package pdftex.def Info: analise-experimentos/densidade_global_comparacao.png  
-used on input line 768.
+used on input line 770.
 (pdftex.def)             Requested size: 312.9803pt x 130.41121pt.
 
 [37 <./analise-experimentos/correlograma_r2_original.png> <./analise-experiment
@@ -1289,7 +1289,7 @@ L3 programming layer <2020/03/25>
  ) 
 Here is how much of TeX's memory you used:
  23448 strings out of 467509
- 379263 string characters out of 5408780
+ 379343 string characters out of 5408780
  1248440 words of memory out of 5000000
  51777 multiletter control sequences out of 15000+600000
  703547 words of font info for 207 fonts, out of 8000000 for 9000
@@ -1315,9 +1315,9 @@ Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmssbx10.pfb><C
 /Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:
 /Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/
 msbm10.pfb>
-Output written on Victor_Cobo_PGC.pdf (49 pages, 1803364 bytes).
+Output written on Victor_Cobo_PGC.pdf (49 pages, 1804115 bytes).
 PDF statistics:
- 1071 PDF objects out of 1200 (max. 8388607)
+ 1073 PDF objects out of 1200 (max. 8388607)
  321 named destinations out of 1000 (max. 500000)
  43150 words of extra memory for PDF output out of 51595 (max. 10000000)
 

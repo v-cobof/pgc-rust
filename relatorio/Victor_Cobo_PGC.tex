@@ -120,15 +120,15 @@
 
 % --- Agradecimentos ---
 \begin{agradecimentos}
-Agradeço primeiramente ao meu orientador, Prof. Dr. Carlos Alberto Kamienski, pelo suporte técnico, paciência e pelas valiosas discussões acadêmicas ao longo do desenvolvimento deste projeto. Agradeço à Universidade Federal do ABC pelo ensino público de excelência e a todos os professores que contribuíram para minha formação científica. Por fim, aos meus amigos e familiares, cujo encorajamento foi essencial nesta jornada.
+Agradeço primeiramente ao meu orientador, Prof. Dr. Carlos Alberto Kamienski, pelo suporte técnico, paciência e pelas valiosas discussões acadêmicas ao longo do desenvolvimento deste projeto. Agradeço profundamente aos meus pais pelo apoio incondicional, amor e sacrifícios que tornaram esta conquista possível. Aos meus grandes amigos Leandro Diomar e Carlos Quintino, agradeço pelo companheirismo, incentivo constante e pelas noites de estudo compartilhadas durante toda esta jornada acadêmica. Por fim, agradeço à Universidade Federal do ABC pelo ensino público de excelência e a todos os professores que contribuíram para minha formação científica.
 \end{agradecimentos}
 
 % --- Epígrafe ---
 \begin{epigrafe}
     \vspace*{\fill}
 	\begin{flushright}
-		\textit{``A tecnologia é apenas uma ferramenta. No que diz respeito a fazer as crianças trabalharem juntas e motivá-las, o professor é o mais importante.''\\
-		(Bill Gates)}
+		\textit{``A simplicidade é um grande pré-requisito para a confiabilidade.''\\
+		(Edsger W. Dijkstra)}
 	\end{flushright}
 \end{epigrafe}
 
@@ -247,6 +247,8 @@ Estruturas de representação na memória para busca de vizinhos mais próximos 
 }
 \fonte{O Autor (2026)}
 \end{table}
+
+Todo o código-fonte desenvolvido para este projeto, incluindo os módulos do ecossistema distribuído em Rust e os scripts auxiliares em Python, está disponível publicamente no GitHub no repositório \href{https://github.com/v-cobof/pgc-rust}{\texttt{https://github.com/v-cobof/pgc-rust}}.
 
 \section{ORGANIZAÇÃO DO TEXTO}
 
@@ -608,7 +610,7 @@ Para garantir a reprodutibilidade de todas as avaliações de desempenho do ecos
 
 \section{Detalhes de Implementação e Execução do Código}
 
-A concretização prática do ecossistema distribuído envolveu a escrita de código em duas linguagens com propósitos distintos: Rust, para os componentes operacionais de tempo de execução no contínuo IoT, e Python, para os scripts de modelagem estatística, validação e plotagem de gráficos.
+A concretização prática do ecossistema distribuído envolveu a escrita de código em duas linguagens com propósitos distintos: Rust, para os componentes operacionais de tempo de execução no contínuo IoT, e Python, para os scripts de modelagem estatística, validação e plotagem de gráficos. Todo o código-fonte desenvolvido está hospedado publicamente no GitHub sob o repositório \href{https://github.com/v-cobof/pgc-rust}{\texttt{https://github.com/v-cobof/pgc-rust}}.
 
 \subsection{Implementação dos Módulos em Rust}
 Todos os quatro módulos Rust (\texttt{simulador}, \texttt{LoRa}, \texttt{processador} e \texttt{receiver}) compartilham de uma arquitetura modular voltada ao desempenho e segurança. As escolhas de crates (bibliotecas) foram orientadas para manter o footprint mínimo compatível com o target \texttt{wasm32-wasip1}:
