@@ -10,12 +10,35 @@
 {ADELANTADO, F. et al. Understanding the limits of lorawan.
 \emph{IEEE Communications Magazine}, IEEE, v.~55, n.~9, p. 34--40, 2017.}
 
+\bibitem[Al-Fuqaha et al. 2015]{alfuqaha2015iot}
+\abntrefinfo{Al-Fuqaha et al.}{AL-FUQAHA et al.}{2015}
+{AL-FUQAHA, A. et al. Internet of things: A survey on enabling technologies,
+  protocols, and applications.
+\emph{IEEE Communications Surveys \& Tutorials}, v.~17, n.~4, p. 2347--2376,
+  2015.}
+
+\bibitem[Bonomi et al. 2012]{bonomi2012fog}
+\abntrefinfo{Bonomi et al.}{BONOMI et al.}{2012}
+{BONOMI, F. et al. Fog computing and its role in the internet of things. In:
+  \emph{Proceedings of the first edition of the MCC workshop on Mobile cloud
+  computing}. [S.l.: s.n.], 2012. p. 13--16.}
+
 \bibitem[Box e Muller 1958]{box1958muller}
 \abntrefinfo{Box e Muller}{BOX; MULLER}{1958}
 {BOX, G. E.~P.; MULLER, M.~E. A note on the generation of random normal
   deviates.
 \emph{The Annals of Mathematical Statistics}, JSTOR, v.~29, n.~2, p. 610--611,
   1958.}
+
+\bibitem[Buyya e Srirama 2018]{buyya2018fog}
+\abntrefinfo{Buyya e Srirama}{BUYYA; SRIRAMA}{2018}
+{BUYYA, R.; SRIRAMA, S.~N. \emph{Fog Computing: Principles and Paradigms}.
+  [S.l.]: John Wiley \& Sons, 2018.}
+
+\bibitem[Guan et al. 2022]{guan2022wasm}
+\abntrefinfo{Guan et al.}{GUAN et al.}{2022}
+{GUAN, Y. et al. Application of webassembly in iot edge computing: A review.
+\emph{IEEE Internet of Things Journal}, v.~9, n.~20, p. 19632--19645, 2022.}
 
 \bibitem[Haas et al. 2017]{haas2017wasm}
 \abntrefinfo{Haas et al.}{HAAS et al.}{2017}
@@ -48,15 +71,39 @@
 {MATSAKIS, N.~D.; II, F.~S. K. The rust language.
 \emph{ACM SIGAda Ada Letters}, ACM, v.~34, n.~3, p. 103--104, 2014.}
 
+\bibitem[Naha et al. 2018]{naha2018fog}
+\abntrefinfo{Naha et al.}{NAHA et al.}{2018}
+{NAHA, R.~K. et al. Fog computing: Survey of trends, architectures,
+  requirements, and research directions.
+\emph{IEEE Access}, v.~6, p. 47962--47989, 2018.}
+
 \bibitem[Pearson 1895]{pearson1895}
 \abntrefinfo{Pearson}{PEARSON}{1895}
 {PEARSON, K. Note on regression and inheritance in the case of two parents.
 \emph{Proceedings of the Royal Society of London}, v.~58, p. 240--242, 1895.}
 
+\bibitem[Pfandzelter e Bermbach 2021]{pfandzelter2021orchestration}
+\abntrefinfo{Pfandzelter e Bermbach}{PFANDZELTER; BERMBACH}{2021}
+{PFANDZELTER, T.; BERMBACH, D. Edge-to-cloud continuum: An orchestration
+  perspective.
+\emph{IEEE Internet Computing}, v.~25, n.~5, p. 43--50, 2021.}
+
+\bibitem[Puliafito et al. 2019]{puliafito2019mobility}
+\abntrefinfo{Puliafito et al.}{PULIAFITO et al.}{2019}
+{PULIAFITO, C. et al. Mobility-aware resource provisioning in the iot-cloud
+  continuum.
+\emph{IEEE Internet of Things Journal}, v.~6, n.~1, p. 448--459, 2019.}
+
 \bibitem[Silverman 1986]{silverman1986kde}
 \abntrefinfo{Silverman}{SILVERMAN}{1986}
 {SILVERMAN, B.~W. \emph{Density Estimation for Statistics and Data Analysis}.
   London: Chapman \& Hall, 1986.}
+
+\bibitem[Varia, Solanki e Wandra 2021]{varia2021wasm}
+\abntrefinfo{Varia, Solanki e Wandra}{VARIA; SOLANKI; WANDRA}{2021}
+{VARIA, N.; SOLANKI, S.; WANDRA, K. A comparative study of webassembly runtimes
+  for edge computing. In:  \emph{Proceedings of the IEEE 14th International
+  Conference on Cloud Computing (CLOUD)}. [S.l.: s.n.], 2021. p. 234--242.}
 
 \bibitem[{WasmEdge Runtime} 2023]{wasmedge2023}
 \abntrefinfo{{WasmEdge Runtime}}{{WasmEdge Runtime}}{2023}

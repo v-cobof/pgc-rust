@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.6.18)  24 JUN 2026 21:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.6.18)  1 JUL 2026 21:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1158,21 +1158,17 @@ Package babel Info: 'brazil' activates 'portuges' shorthands.
 Cap\'{\i }tulo 2.
 [15
 
-] [16{C:/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex
-.enc}] [17] [18] [19] [20] [21]
+] [16] [17] [18] [19{C:/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/enc/dvi
+ps/lm/lm-mathex.enc}] [20] [21] [22] [23] [24] [25]
 Cap\'{\i }tulo 3.
-[22
-
-] [23]
-Cap\'{\i }tulo 4.
-<esquema_logico.png, id=366, 246.6816pt x 246.6816pt>
+<esquema_logico.png, id=411, 1005.7575pt x 229.85875pt>
 File: esquema_logico.png Graphic file (type png)
 <use esquema_logico.png>
-Package pdftex.def Info: esquema_logico.png  used on input line 446.
-(pdftex.def)             Requested size: 455.0pt x 455.0439pt.
-[24
+Package pdftex.def Info: esquema_logico.png  used on input line 473.
+(pdftex.def)             Requested size: 341.43306pt x 78.03168pt.
+[26
 
- <./esquema_logico.png>] [25] [26]
+ <./esquema_logico.png (PNG copy)>] [27] [28]
 (C:\Users\vcobo\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
@@ -1180,108 +1176,102 @@ File: lstlang1.sty 2025/11/14 1.11b listings language file
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 509.
+nput line 536.
 
-[27] [28] [29]
+[29] [30]
+Cap\'{\i }tulo 4.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 616.
+[31
+
+] [32] [33] [34]
 Cap\'{\i }tulo 5.
-[30
-
-] [31]
-Cap\'{\i }tulo 6.
-<analise-experimentos/densidade_artigo_original.png, id=469, 867.24pt x 361.35p
+<analise-experimentos/densidade_artigo_original.png, id=518, 867.24pt x 361.35p
 t>
 File: analise-experimentos/densidade_artigo_original.png Graphic file (type png
 )
 <use analise-experimentos/densidade_artigo_original.png>
 Package pdftex.def Info: analise-experimentos/densidade_artigo_original.png  us
-ed on input line 654.
-(pdftex.def)             Requested size: 364.00139pt x 151.66672pt.
-<analise-experimentos/densidade_artigo_sintetico.png, id=470, 867.24pt x 361.35
+ed on input line 706.
+(pdftex.def)             Requested size: 222.9525pt x 92.89565pt.
+<analise-experimentos/densidade_artigo_sintetico.png, id=519, 867.24pt x 361.35
 pt>
 File: analise-experimentos/densidade_artigo_sintetico.png Graphic file (type pn
 g)
 <use analise-experimentos/densidade_artigo_sintetico.png>
 Package pdftex.def Info: analise-experimentos/densidade_artigo_sintetico.png  u
-sed on input line 660.
-(pdftex.def)             Requested size: 364.00139pt x 151.66672pt.
-[32
+sed on input line 712.
+(pdftex.def)             Requested size: 222.9525pt x 92.89565pt.
+[35
 
-] [33 <./analise-experimentos/densidade_artigo_original.png> <./analise-experim
-entos/densidade_artigo_sintetico.png>]
-<analise-experimentos/correlograma_r1_original.png, id=485, 601.7682pt x 518.41
+ <./analise-experimentos/densidade_artigo_original.png> <./analise-experimentos
+/densidade_artigo_sintetico.png>]
+<analise-experimentos/correlograma_r1_original.png, id=530, 601.7682pt x 518.41
 68pt>
 File: analise-experimentos/correlograma_r1_original.png Graphic file (type png)
 
 <use analise-experimentos/correlograma_r1_original.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r1_original.png  use
-d on input line 678.
-(pdftex.def)             Requested size: 364.00139pt x 313.5917pt.
-<analise-experimentos/correlograma_r1_sintetico.png, id=486, 611.4042pt x 518.4
+d on input line 730.
+(pdftex.def)             Requested size: 222.9525pt x 192.06433pt.
+<analise-experimentos/correlograma_r1_sintetico.png, id=531, 611.4042pt x 518.4
 168pt>
 File: analise-experimentos/correlograma_r1_sintetico.png Graphic file (type png
 )
 <use analise-experimentos/correlograma_r1_sintetico.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r1_sintetico.png  us
-ed on input line 684.
-(pdftex.def)             Requested size: 364.00139pt x 308.6477pt.
- [34]
-Overfull \vbox (7.18921pt too high) has occurred while \output is active []
-
-
-[35 <./analise-experimentos/correlograma_r1_original.png> <./analise-experiment
-os/correlograma_r1_sintetico.png>]
-<analise-experimentos/correlograma_r2_original.png, id=497, 578.16pt x 518.4168
+ed on input line 736.
+(pdftex.def)             Requested size: 222.9525pt x 189.04256pt.
+<analise-experimentos/correlograma_r2_original.png, id=532, 578.16pt x 518.4168
 pt>
 File: analise-experimentos/correlograma_r2_original.png Graphic file (type png)
 
 <use analise-experimentos/correlograma_r2_original.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r2_original.png  use
-d on input line 696.
-(pdftex.def)             Requested size: 364.00139pt x 326.38281pt.
-<analise-experimentos/correlograma_r2_sintetico.png, id=498, 611.4042pt x 518.4
+d on input line 748.
+(pdftex.def)             Requested size: 222.9525pt x 199.91144pt.
+<analise-experimentos/correlograma_r2_sintetico.png, id=533, 611.4042pt x 518.4
 168pt>
 File: analise-experimentos/correlograma_r2_sintetico.png Graphic file (type png
 )
 <use analise-experimentos/correlograma_r2_sintetico.png>
 Package pdftex.def Info: analise-experimentos/correlograma_r2_sintetico.png  us
-ed on input line 702.
-(pdftex.def)             Requested size: 364.00139pt x 308.6477pt.
-
-Overfull \vbox (19.98032pt too high) has occurred while \output is active []
-
-
-[36 <./analise-experimentos/correlograma_r2_original.png> <./analise-experiment
-os/correlograma_r2_sintetico.png>]
-<analise-experimentos/densidade_global_comparacao.png, id=509, 867.24pt x 361.3
+ed on input line 754.
+(pdftex.def)             Requested size: 222.9525pt x 189.04256pt.
+ [36 <./analise-experimentos/correlograma_r1_original.png> <./analise-experimen
+tos/correlograma_r1_sintetico.png>]
+<analise-experimentos/densidade_global_comparacao.png, id=544, 867.24pt x 361.3
 5pt>
 File: analise-experimentos/densidade_global_comparacao.png Graphic file (type p
 ng)
 <use analise-experimentos/densidade_global_comparacao.png>
 Package pdftex.def Info: analise-experimentos/densidade_global_comparacao.png  
-used on input line 716.
-(pdftex.def)             Requested size: 455.0pt x 189.58478pt.
- [37 <./analise-experimentos/densidade_global_comparacao.png>] [38] [39] [40] [
-41]
-Cap\'{\i }tulo 7.
+used on input line 768.
+(pdftex.def)             Requested size: 312.9803pt x 130.41121pt.
+
+[37 <./analise-experimentos/correlograma_r2_original.png> <./analise-experiment
+os/correlograma_r2_sintetico.png> <./analise-experimentos/densidade_global_comp
+aracao.png>] [38] [39] [40] [41]
+Cap\'{\i }tulo 6.
 (Victor_Cobo_PGC.bbl [42
 
 ]
 bibitemlist
-) [43
+[43
 
-]
+]) [44]
 AP\^ENDICE A.
-[44
-
-]
-AP\^ENDICE B.
 [45
 
 ]
-AP\^ENDICE C.
+AP\^ENDICE B.
 [46
 
-] [47]
+]
+AP\^ENDICE C.
+[47
+
+] [48]
 \tf@lof=\write4
 \openout4 = `Victor_Cobo_PGC.lof'.
 
@@ -1298,11 +1288,11 @@ L3 programming layer <2020/03/25>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 23376 strings out of 467509
- 378033 string characters out of 5408780
- 1247966 words of memory out of 5000000
- 51740 multiletter control sequences out of 15000+600000
- 702261 words of font info for 197 fonts, out of 8000000 for 9000
+ 23448 strings out of 467509
+ 379263 string characters out of 5408780
+ 1248440 words of memory out of 5000000
+ 51777 multiletter control sequences out of 15000+600000
+ 703547 words of font info for 207 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,107p,2153b,2434s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pf
@@ -1320,13 +1310,14 @@ Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss17.pfb><C:/
 Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmssbx10.pfb><C
 :/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C
 :/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:
+/Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtk10.pfb><C:
 /Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:
 /Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:
 /Users/vcobo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/
 msbm10.pfb>
-Output written on Victor_Cobo_PGC.pdf (48 pages, 1749422 bytes).
+Output written on Victor_Cobo_PGC.pdf (49 pages, 1803364 bytes).
 PDF statistics:
- 1010 PDF objects out of 1200 (max. 8388607)
- 305 named destinations out of 1000 (max. 500000)
- 42606 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 1071 PDF objects out of 1200 (max. 8388607)
+ 321 named destinations out of 1000 (max. 500000)
+ 43150 words of extra memory for PDF output out of 51595 (max. 10000000)
 

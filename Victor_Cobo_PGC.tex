@@ -250,7 +250,7 @@ Estruturas de representação na memória para busca de vizinhos mais próximos 
 
 \section{ORGANIZAÇÃO DO TEXTO}
 
-Este trabalho está estruturado da seguinte forma: o Capítulo~\ref{cap:referencial} apresenta o referencial teórico cobrindo as tecnologias Rust, WebAssembly, kNN, RLE e o gerador estocástico; o Capítulo~\ref{cap:revisao} detalha a revisão de literatura com foco no artigo MetroAGriFor 2020; o Capítulo~\ref{cap:desenvolvimento} descreve a arquitetura e implementação dos componentes; o Capítulo~\ref{cap:metodologia} apresenta a metodologia de teste e o plano de validação; o Capítulo~\ref{cap:resultados} discute os resultados obtidos, acompanhados das análises estatísticas e dos gráficos; e o Capítulo~\ref{cap:conclusao} resume as principais conclusões e propostas para trabalhos futuros.
+Este trabalho está estruturado da seguinte forma: o Capítulo~\ref{cap:referencial} apresenta o referencial teórico cobrindo as tecnologias Rust, WebAssembly, kNN, RLE, o gerador estocástico e a revisão da literatura de base; o Capítulo~\ref{cap:desenvolvimento} descreve a arquitetura e implementação dos componentes; o Capítulo~\ref{cap:metodologia} apresenta a metodologia de teste e o plano de validação; o Capítulo~\ref{cap:resultados} discute os resultados obtidos, acompanhados das análises estatísticas e dos gráficos; e o Capítulo~\ref{cap:conclusao} resume as principais conclusões e propostas para trabalhos futuros.
 
 % ==========================================================
 \chapter{REFERENCIAL TEÓRICO}
@@ -259,27 +259,54 @@ Este trabalho está estruturado da seguinte forma: o Capítulo~\ref{cap:referenc
 
 \section{Computação em Névoa (Fog Computing)}
 
-A computação em névoa estende o paradigma da computação em nuvem para a borda da rede de modo a mitigar a latência e o consumo de banda. Em contraste com a nuvem, a névoa oferece recursos descentralizados com localização geográfica distribuída e proximidade física com os dispositivos IoT. Em sistemas agrícolas, os gateways locais (como Raspberry Pi ou gateways industriais) atuam como nós de névoa, realizando o processamento preliminar de leituras de sensores antes de encaminhá-las aos servidores de aplicação remotos.
+A computação em névoa (\textit{Fog Computing}) estende os recursos computacionais, de armazenamento e de rede da computação em nuvem para a proximidade física dos dispositivos de borda na Internet das Coisas (IoT) \cite{bonomi2012fog}. O paradigma surge como uma camada arquitetural intermediária necessária para lidar com o crescimento exponencial de sensores físicos gerando dados em alta frequência. 
+
+Nas arquiteturas de IoT convencionais, o sensoriamento contínuo depende de protocolos de transporte leves para comunicação com a nuvem, tais como o MQTT (\textit{Message Queuing Telemetry Transport}) ou o CoAP (\textit{Constrained Application Protocol}) \cite{alfuqaha2015iot}. No entanto, mesmo com o uso de payloads enxutos baseados nesses protocolos, a transmissão ininterrupta de dados brutos e ruidosos (por exemplo, leituras decimais de temperatura e umidade a cada poucos segundos) gera gargalos severos de rede, especialmente em áreas agrícolas remotas operando sob conexões sem fio instáveis ou satelitais de alto custo.
+
+Ao contrário da infraestrutura centralizada da nuvem, a névoa caracteriza-se por sua distribuição geográfica descentralizada, suporte à mobilidade de nós, baixa latência de comunicação e forte dependência de conexões de rádio locais \cite{buyya2018fog}. Em sistemas agrícolas modernos, os nós de névoa — representados por computadores de placa única como Raspberry Pi ou gateways industriais — processam dados de sensores de campo locally, filtrando ruídos, executando lógica analítica e encaminhando apenas informações consolidadas ou alarmes para a nuvem. Isso reduz significativamente a dependência de conexões WAN de alto custo ou restritas (como satélite ou celular) e otimiza o uso de banda larga de rede.
 
 \section{IoT-Cloud Continuum (IoTinuum)}
 
-O conceito de contínuo IoT-Nuvem (\textit{IoT-Cloud Continuum}), frequentemente denominado de \textit{IoTinuum}, representa a integração e a orquestração unificada de recursos computacionais distribuídos ao longo de toda a infraestrutura física e de rede, estendendo-se desde os dispositivos de borda mais básicos (Things/Sensores) até os datacenters de nuvem de alta capacidade, passando pelas camadas intermediárias da névoa. 
+O conceito de contínuo IoT-Nuvem (\textit{IoT-Cloud Continuum}), também designado na literatura técnica por \textit{IoTinuum}, representa uma quebra de paradigma na infraestrutura tradicional de sistemas da Internet das Coisas (IoT). Em vez de modelar a rede em camadas computacionais isoladas e silos de comunicação monolíticos, o contínuo propõe uma integração sem costuras, orquestrada de ponta a ponta, que se estende dos dispositivos mais básicos e periféricos até os servidores corporativos centralizados na nuvem \cite{kamienski2017iotinuum}.
 
-Em vez de tratar a névoa e a nuvem como silos de computação isolados, o \textit{IoTinuum} propõe um ambiente de execução contínuo no qual as tarefas de processamento de dados, filtragem e tomada de decisão são dinamicamente alocadas e executadas no ponto mais adequado da rede. No monitoramento agrícola inteligente, o contínuo permite balancear o consumo de energia dos nós sensores de campo com a largura de banda disponível nos gateways locais de névoa e a capacidade de processamento analítico histórico na nuvem, otimizando o fluxo de dados de ponta a ponta \cite{kamienski2017iotinuum}.
+Para estruturar e viabilizar este contínuo, a literatura descreve uma arquitetura de referência tipicamente dividida em três fases ou camadas fundamentais \cite{naha2018fog, puliafito2019mobility}:
+\begin{enumerate}
+    \item \textbf{Things / Dispositivos Físicos (Fase de Aquisição)}: Representa a camada de sensoriamento de borda extrema. É composta por nós de sensores (ex: DHT22, termopares) e microcontroladores de baixíssimo custo de processamento, cuja função prioritária é coletar e digitalizar grandezas físicas (temperatura, umidade, pressão) do ambiente agrícola inteligente. Nesta camada, a capacidade de memória RAM e de processamento é tão severamente restrita que tarefas complexas de filtragem não podem ser executadas localmente;
+    \item \textbf{Edge e Fog Computing (Fase de Pré-processamento e Filtragem)}: Camada intermediária que reside na rede local. Os nós de névoa (\textit{fog nodes}), como gateways de comunicação industrial, Raspberry Pi ou servidores locais, atuam como pontes ativas entre o campo físico e a rede WAN. Estes nós concentram dados de múltiplos sensores locais, executam algoritmos inteligentes de classificação (como $k$NN) e encoders de compactação (como RLE) para extrair o status agronômico do ambiente e comprimir redundâncias antes do envio para a Internet;
+    \item \textbf{Cloud Computing (Fase Analítica Global e Persistência)}: Camada superior centralizada de alta disponibilidade e capacidade de processamento (ex: clusters AWS ou Google Cloud). Na nuvem, os dados comprimidos são decodificados, indexados em bancos de dados históricos de longo prazo, apresentados aos produtores em painéis gráficos interativos e utilizados para treinar algoritmos de aprendizado de máquina globais.
+\end{enumerate}
 
-\section{Rust e WebAssembly (WASM)}
+Um dos maiores desafios científicos no gerenciamento do contínuo consiste na orquestração dinâmica dessas camadas distribuídas. Frameworks de orquestração consolidados na nuvem (como Kubernetes ou suas variantes voltadas à borda como KubeEdge) impõem uma sobrecarga de CPU, memória RAM e armazenamento que inviabiliza sua implantação em pequenos gateways embarcados locais \cite{pfandzelter2021orchestration}. O ecossistema do contínuo demanda, portanto, uma arquitetura de execução de microsserviços muito mais leve e flexível, capaz de migrar código compilado de maneira rápida e segura entre os diferentes nós de hardware do \textit{IoTinuum} sem a necessidade de manter sistemas operacionais virtuais pesados.
+
+\section{Rust e WebAssembly (WASM): Os Encoders do IoTinuum}
+
+Para que a migração de tarefas seja viável na prática ao longo do contínuo heterogêneo do \textit{IoTinuum}, a engenharia de software exige um ecossistema que combine eficiência de recursos com isolamento e portabilidade. O núcleo deste trabalho baseia-se na união da linguagem de programação Rust com o bytecode do WebAssembly (WASM), atuando como o elemento catalisador da computação portátil na névoa.
 
 \subsection{Linguagem Rust}
 
-Rust é uma linguagem de programação focada em segurança, velocidade e concorrência \cite{matsakis2014rust}. Seu sistema de tipos e o conceito de posse (\textit{ownership}) com checagem de tempo de vida (\textit{borrow checker}) eliminam erros comuns de gerência de memória em tempo de compilação, sem depender de coleta de lixo. Isso garante um consumo de memória previsível e baixo, ideal para os dispositivos de borda.
+Rust é uma linguagem de sistemas focada em segurança de memória, velocidade de execução e concorrência eficiente \cite{matsakis2014rust}. Por meio de seu inovador sistema de checagem de regras de empréstimo e tempo de vida de dados (\textit{borrow checker}), a linguagem garante o controle estrito sobre alocações de memória diretamente em tempo de compilação, eliminando a necessidade de um coletor de lixo (\textit{garbage collector}). 
+
+Esta característica traduz-se em binários com consumo de memória extremamente baixo e tempo de resposta previsível. Rust é a linguagem ideal para codificar algoritmos analíticos em nós de névoa e sensores de campo de baixa potência, gerando o máximo de eficiência energética.
 
 \subsection{WebAssembly (WASM) e WASI}
 
-WebAssembly é um formato de instrução binária projetado para ser executado de forma portável em uma máquina virtual baseada em pilha \cite{haas2017wasm}. Embora originalmente concebido para navegadores web, o WASM expandiu-se para o lado do servidor por meio da \textit{WebAssembly System Interface} (WASI), que padroniza o acesso a recursos do sistema operacional (como arquivos, rede e relógio). O bytecode WASM é executado sob isolamento completo (\textit{sandbox}), protegendo o gateway hospedeiro contra códigos maliciosos ou falhas de execução.
+O WebAssembly (WASM) é um formato de instrução binária de baixo nível projetado para ser executado em uma máquina virtual baseada em pilha com isolamento estrito (\textit{sandboxing}) \cite{haas2017wasm}. Embora originalmente concebido para navegadores web, o WASM expandiu-se rapidamente para cenários de computação de borda e névoa devido à introdução da \textit{WebAssembly System Interface} (WASI), que padroniza o acesso seguro a recursos do sistema operacional hospedeiro.
+
+Ao contrário de ambientes tradicionais baseados na Máquina Virtual Java (JVM) — que impõem um consumo massivo de memória em tempo de execução — ou de contêineres Docker — que exigem o isolamento pesado a nível de kernel e imagens de dezenas de megabytes —, o bytecode WASM é executado a velocidades quase nativas (tipicamente com desvio de apenas 1,1x a 1,5x o desempenho do código compilado diretamente para a máquina nativa) utilizando compilação JIT (\textit{Just-In-Time}) e AOT (\textit{Ahead-Of-Time}) em ambientes constritos de hardware \cite{varia2021wasm}.
+
+O WASM apresenta vantagens tecnológicas cruciais frente à virtualização tradicional baseada em contêineres Docker para a computação no \textit{IoTinuum} \cite{guan2022wasm}:
+\begin{itemize}
+    \item \textbf{Portabilidade de Bytecode Universal}: O código compilado para WASM é independente de arquitetura de CPU (ISA-neutral). O mesmo arquivo binário compilado com o target \texttt{wasm32-wasip1} executa sem qualquer modificação em processadores ARM32/ARM64 de gateways locais ou em arquiteturas x86\_64 em datacenters na nuvem, desde que haja um interpretador de bytecode disponível;
+    \item \textbf{Inicialização em Microsegundos (Cold Start zero)}: Enquanto contêineres Docker tradicionais necessitam de segundos para iniciar o sistema de arquivos virtualizado e carregar bibliotecas compartilhadas, instâncias WASM são instanciadas em escalas de microsegundos, permitindo que nós sensores entrem em modo de economia de energia e iniciem o processamento instantaneamente ao detectar novos dados;
+    \item \textbf{Segurança e Isolamento por Sandbox}: O runtime WASM isola completamente a aplicação em memória. O acesso do bytecode a arquivos, rede ou temporizadores é bloqueado por padrão e deve ser explicitamente fornecido no momento da instanciação da máquina virtual por meio de capabilidades configuradas pelo hospedeiro;
+    \item \textbf{Footprint Mínimo de Memória e Armazenamento}: Módulos WASM ocupam apenas algumas dezenas de kilobytes, o que otimiza sua distribuição na rede rural e possibilita executar centenas de sandboxes concorrentes em dispositivos embarcados com menos de 512 MB de RAM.
+\end{itemize}
 
 \subsection{WasmEdge Runtime}
 
-WasmEdge é um interpretador e compilador JIT/AOT de WebAssembly de alto desempenho otimizado para cenários de computação de borda, névoa e microsserviços \cite{wasmedge2023}. Desenvolvido sob a tutela da Cloud Native Computing Foundation (CNCF), ele suporta a especificação WASI e oferece extensões para acelerar inferência de redes neurais, tornando-o o runtime ideal para executar pipelines de processamento estocástico e classificação local.
+O WasmEdge é um ambiente de execução (runtime) de WebAssembly de alto desempenho, com suporte a compilações JIT (\textit{Just-In-Time}) e AOT (\textit{Ahead-Of-Time}) \cite{wasmedge2023}. Desenvolvido sob a governança da CNCF, ele destaca-se no ecossistema de borda e névoa por estender a especificação WASI básica com capabilidades avançadas de rede. 
+
+Uma vez que a especificação padrão WASI clássica carece de primitivas nativas de comunicação por rede TCP/UDP, o WasmEdge preenche esta lacuna por meio de APIs que expõem soquetes de rede ao sandbox de maneira segura. Isso possibilita ao ecossistema do processador e do receptor em Rust rodar servidores HTTP assíncronos complexos e realizar chamadas de rede REST diretamente de dentro da máquina virtual WASM na névoa, unindo a segurança do sandbox com a capacidade de integração do \textit{IoTinuum}.
 
 \section{Algoritmo dos k-Vizinhos Mais Próximos (kNN)}
 
@@ -409,27 +436,27 @@ Para a validade da utilização do coeficiente de Pearson como indicador estatí
 
 Na agricultura inteligente, as variáveis climáticas de temperatura e umidade relativa do ar guardam uma relação termodinâmica intrínseca e fortemente inversa: conforme a temperatura do ar se eleva, a umidade relativa do ar tende a diminuir de forma expressiva. Comparar o desvio absoluto entre a correlação da base original ($r_{orig}$) e a correlação da base simulada ($r_{rust}$), dado por $|r_{orig} - r_{rust}|$, é uma métrica científica crítica para validar se a modelagem conjunta multivariada baseada em KDE em Rust foi capaz de preservar essa lei física da natureza no ecossistema sintético.
 
-% ==========================================================
-\chapter{REVISÃO DE LITERATURA}
-\label{cap:revisao}
-% ==========================================================
+\section{Trabalho de Base e Revisão da Literatura}
+\label{sec:trabalho_base}
 
-\section{Trabalho de Base: Ribeiro Junior et al. (2020) - MetroAGriFor 2020}
+Esta seção apresenta a fundamentação e a revisão de literatura do projeto, centrada no trabalho de base que deu origem à presente implementação e detalhando os avanços tecnológicos desenvolvidos neste projeto para transpor a teoria para um ecossistema prático executável.
 
-Este projeto baseia-se diretamente na metodologia proposta por Ribeiro Junior et al. \cite{ribeiro2020nearest}, intitulada \textit{"A Nearest Neighbors based Data Filter for Fog Computing in IoT Smart Agriculture"}. Aquele artigo estabeleceu as bases teóricas de um filtro de dados inteligente instalado em gateways de névoa locais.
+\subsection{Trabalho de Base: Ribeiro Junior et al. (2020) - MetroAGriFor 2020}
 
-No trabalho original, o filtro opera sobre sensores de temperatura e umidade aplicados à cultura de tomateiro. Para tal, as condições da planta são categorizadas de acordo com parâmetros agronômicos de estresse hídrico e térmico, gerando dados discretos que representam os estados de "Optimal", "Marginal", "Upper Fail", entre outros. O classificador $k$NN em nível de gateway é encarregado de mapear as variáveis físicas contínuas para essas classes discretas.
+O presente projeto baseia-se diretamente na metodologia analítica proposta por Ribeiro Junior et al. \cite{ribeiro2020nearest}, intitulada \textit{"A Nearest Neighbors based Data Filter for Fog Computing in IoT Smart Agriculture"}. Aquele estudo de base introduziu as bases teóricas de um filtro de dados inteligente operando diretamente no nível dos gateways locais de névoa agrícola.
 
-A proposta de Ribeiro Junior et al. demonstrou que, ao invés de transmitir as leituras flutuantes originais com alta frequência para a nuvem, a transmissão de sequências compactas de classes reduz sensivelmente o payload do protocolo de transporte (como MQTT ou HTTP sobre redes de satélite ou LoRa). A aplicação de compressão de corrida RLE sobre a cadeia de símbolos gerada pelo kNN estende essa redução ao compactar repetições temporais contíguas.
+No projeto original, a análise é aplicada a leituras contínuas de sensores físicos de temperatura e umidade relativa do ar voltados ao monitoramento da cultura do tomateiro. As condições de saúde agrometeorológica da cultura são descritas por meio de faixas térmicas e hídricas associadas a estresse vegetativo, as quais definem 11 estados discretos específicos (como \textit{Optimal}, \textit{Marginal}, \textit{Upper Fail}, entre outros). O classificador $k$NN em nível de gateway mapeia em tempo real os valores físicos contínuos das leituras para estas representações discretas de um caractere.
 
-\section{Avanços Introduzidos pelo Presente Projeto}
+Ribeiro Junior et al. demonstraram que, em vez de transmitir dados brutos contínuos em alta frequência sobre canais de comunicação com largura de banda restrita (como links de satélite ou redes LPWAN), a transmissão exclusiva das cadeias de caracteres geradas pelo kNN reduz substancialmente a carga do protocolo. Ao aplicar o codificador RLE sobre a cadeia de categorias kNN, o ganho de compressão aumenta substancialmente ao agrupar repetições consecutivas resultantes da inércia térmica do ambiente agrícola.
 
-Embora cientificamente elegante, o projeto original de Ribeiro Junior et al. \cite{ribeiro2020nearest} foi concebido de forma puramente teórica e avaliado localmente via scripts de simulação offline (MATLAB/Python). O presente trabalho promove os seguintes avanços metodológicos e de engenharia de software:
+\subsection{Diferenciais e Avanços Introduzidos pelo Ecossistema Proposto}
+
+Apesar de sua contribuição teórica, o trabalho de Ribeiro Junior et al. \cite{ribeiro2020nearest} limitou-se a uma validação conceitual off-line por meio de scripts interpretados de simulação executados em laboratório (usando MATLAB e Python). O ecossistema PGC-Rust desenvolvido neste trabalho avança a pesquisa teórica promovendo contribuições práticas de engenharia de software e análise distribuída:
 
 \begin{enumerate}
-    \item \textbf{Mudança de Tecnologia}: Migração completa dos algoritmos de classificação kNN e codificação RLE para código Rust compilado para alvos WebAssembly (\texttt{wasm32-wasi}). Isso garante que a filtragem possa ser implantada de forma leve e segura em gateways reais sob o runtime WasmEdge;
-    \item \textbf{Concepção do Modo Offline com Geração KDE}: Implementação de um gerador estocástico nativo em Rust que opera sob as restrições WASI. Isso permite aos operadores de gateways emular dados sintéticos com base em um arquivo original sem a necessidade de manter o sensor físico acoplado durante fases de calibração;
-    \item \textbf{Avaliação Célula de Lote Estrita}: Teste do impacto prático de diferentes limites temporais de buffers (de 6 a 20.000 pacotes) para analisar as características reais de latência e ganho de compressão do RLE em escala temporal de produção.
+    \item \textbf{Sandbox e Portabilidade Universal via WebAssembly}: Toda a lógica algorítmica de classificação $k$NN ($k=3$) e codificação RLE foi migrada para código compilável em Rust voltado ao target WebAssembly (\texttt{wasm32-wasip1}). Isso garante que o pipeline de filtragem possa ser implantada localmente de forma ultra-leve, portável e segura em gateways reais de baixo custo de mercado (como Raspberry Pi ou gateways LoRa) sob a execução isolada do runtime WasmEdge;
+    \item \textbf{Mecanismo de Geração Estocástica Autônoma (KDE em Rust)}: Concebeu-se e implementou-se um gerador estocástico off-line completo via Estimativa de Densidade por Kernel (KDE) e transformada de Box-Muller rodando nativamente dentro da máquina virtual WebAssembly. Isso possibilita a emulação de grandes massas de dados sintéticos mantendo a consistência estatística de campo (conforme validado pelo teste Kolmogorov-Smirnov e Pearson) sem depender do acoplamento contínuo dos sensores físicos ou de bibliotecas externas do sistema operacional hospedeiro;
+    \item \textbf{Avaliação Experimental do Tamanho do Buffer (Efeito de Lote)}: Avaliação prática de 5 tamanhos de lote temporais distintos (de 6 a 20.000 amostras) para analisar a sensibilidade de compressão do RLE perante oscilações reais de sensores em bordas de rede sob condições agrícolas simuladas.
 \end{enumerate}
 
 % ==========================================================
@@ -443,7 +470,7 @@ O ecossistema implementado divide-se em quatro componentes principais distribuí
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{esquema_logico.png} 
+\includegraphics[width=12cm]{esquema_logico.png} 
 \caption{Esquema lógico do pipeline: Sensor $\to$ Gateway LoRa $\to$ Processador (Névoa kNN+RLE) $\to$ Nuvem}
 \label{fig:diagrama_blocos}
 \fonte{O Autor (2026)}
@@ -579,6 +606,31 @@ Estes logs registram a execução exata dos experimentos de compactação utiliz
 
 Para garantir a reprodutibilidade de todas as avaliações de desempenho do ecossistema, os testes operacionais (envolvendo os quatro módulos Rust desenvolvidos) e as análises estatísticas em Python foram executados inteiramente em ambiente Linux. Especificamente, utilizou-se a distribuição Ubuntu instalada via subsistema Windows para Linux (WSL - \textit{Windows Subsystem for Linux}) executando sob um computador pessoal munido do sistema operacional Windows 11. As aplicações Rust compiladas para o target WebAssembly System Interface (\texttt{wasm32-wasip1}) foram executadas utilizando o runtime WasmEdge, o qual disponibiliza a sandbox e os recursos de rede adequados para emular a operação distribuída dos nós sensores e servidores locais.
 
+\section{Detalhes de Implementação e Execução do Código}
+
+A concretização prática do ecossistema distribuído envolveu a escrita de código em duas linguagens com propósitos distintos: Rust, para os componentes operacionais de tempo de execução no contínuo IoT, e Python, para os scripts de modelagem estatística, validação e plotagem de gráficos.
+
+\subsection{Implementação dos Módulos em Rust}
+Todos os quatro módulos Rust (\texttt{simulador}, \texttt{LoRa}, \texttt{processador} e \texttt{receiver}) compartilham de uma arquitetura modular voltada ao desempenho e segurança. As escolhas de crates (bibliotecas) foram orientadas para manter o footprint mínimo compatível com o target \texttt{wasm32-wasip1}:
+\begin{itemize}
+    \item \textbf{Crate \texttt{hyper}}: Utilizada nos módulos \texttt{processador} e \texttt{receiver} para estruturar os servidores HTTP. O \texttt{hyper} é uma biblioteca de rede de baixo nível e alto desempenho escrita em Rust, operando de forma assíncrona sobre o executor do \texttt{tokio};
+    \item \textbf{Crate \texttt{reqwest}}: Utilizada nos componentes \texttt{simulador} e \texttt{LoRa} para realizar requisições HTTP do tipo cliente, disparando os payloads JSON na rede;
+    \item \textbf{Crate \texttt{csv} e \texttt{serde}}: Empregadas para parsing e serialização de dados. O \texttt{csv} permite a leitura ultra-veloz de arquivos tabulares físicos (\texttt{entrada.csv}), enquanto o \texttt{serde} realiza a conversão bidirecional entre estruturas em memória e a representação textual JSON trafegada pela rede;
+    \item \textbf{Crate \texttt{chrono}}: Utilizada para captura de tempos com alta precisão e escrita de logs em formato RFC3339 no \texttt{receiver}.
+\end{itemize}
+
+\subsection{Mapeamento de Diretórios na Sandbox WasmEdge}
+Em tempo de execução, o runtime \texttt{WasmEdge} impõe isolamento de recursos (\textit{sandboxing}). Para permitir que os binários WASM acessem o sistema de arquivos local do gateway hospedeiro — necessário para ler a base de dados físicos \texttt{entrada.csv} no processador e persistir logs de texto (\texttt{monitoramento.txt}) ou relatórios JSON no receptor — é preciso habilitar explicitamente as capabilidades de E/S.
+
+Isso foi realizado pela passagem da flag \texttt{--dir .} na linha de comando do WasmEdge, mapeando o diretório de execução atual no sistema de arquivos virtual da máquina virtual WASM. Sem esse mapeamento, qualquer tentativa de abertura de arquivos pelas APIs nativas do Rust (\texttt{std::fs::OpenOptions}) resultaria em falha de permissão de E/S (erro WASI de capabilidade negada).
+
+\subsection{Estruturação dos Scripts Python}
+Os scripts auxiliares em Python residem na pasta \texttt{gerador-de-dados/} e servem como o arcabouço de validação matemática e de plotagem de contornos:
+\begin{itemize}
+    \item \texttt{gerar\_dados\_sinteticos.py}: Utiliza a biblioteca \texttt{scikit-learn} para ajustar e amostrar do Kernel Density Estimator (\texttt{KernelDensity} com kernel gaussiano), além do \texttt{scipy.stats} para realizar o teste de normalidade de D'Agostino-Pearson e o teste KS;
+    \item \texttt{validar\_dados\_rust.py} e \texttt{gerar\_graficos\_artigo.py}: Implementam a lógica comparativa de Pearson, teste KS de duas amostras e geram os gráficos científicos utilizando \texttt{matplotlib} e \texttt{seaborn} para as rodadas.
+\end{itemize}
+
 \section{O Dataset e o Modelo do Tomateiro}
 
 O modelo agronômico do cultivo de tomateiro define faixas recomendadas de temperatura ($T$) e umidade ($H$). Neste projeto, o conjunto de treinamento da cultura de tomateiro está mapeado em 11 classes distintas de status, detalhadas na Tabela~\ref{tab:tomateiro}.
@@ -606,17 +658,17 @@ O modelo agronômico do cultivo de tomateiro define faixas recomendadas de tempe
 \fonte{Adaptado de Ribeiro Junior et al. \cite{ribeiro2020nearest}}
 \end{table}
 
-A normalização Min-Max dos dados físicos utiliza os limites globais do sensor: para temperatura, $[0,0; 47,0]^\circ\text{C}$; para umidade, $[0,0; 100,0]\%$. O algoritmo $k$NN opera com $k=3$, calculando a distância Euclidiana com os centroides normalizados de cada classe da Tabela~\ref{tab:tomateiro}.
+A base de dados físicos utilizada no experimento (\texttt{entrada.csv}) contém um histórico real de \textbf{44.023 leituras} contínuas coletadas por sensores físicos de temperatura e umidade relativa do ar. Os dados foram capturados com uma frequência de amostragem de 5 segundos, fornecendo leituras decimais precisas. A normalização Min-Max dos dados físicos utiliza os limites globais do sensor: para temperatura, $[0,0; 47,0]^\circ\text{C}$; para umidade, $[0,0; 100,0]\%$. O algoritmo $k$NN opera com $k=3$, calculando a distância Euclidiana com os centroides normalizados de cada classe da Tabela~\ref{tab:tomateiro}.
 
 \section{Configuração dos Experimentos de Compressão}
 
-Para analisar o desempenho do filtro, avaliamos o processo sob 5 tamanhos de lote de transmissão (tamanho do pacote acumulado antes do envio RLE):
+Para analisar o desempenho do filtro de compressão e o seu impacto na latência e no volume de rede, avaliamos o processo sob 5 tamanhos de lote de transmissão (tamanho do pacote acumulado no gateway antes da aplicação do codificador RLE):
 \begin{itemize}
-    \item \textbf{Lote 6} (representando 30 segundos de dados físicos);
-    \item \textbf{Lote 60} (5 minutos);
-    \item \textbf{Lote 720} (1 hora);
-    \item \textbf{Lote 4.320} (6 horas);
-    \item \textbf{Lote 20.000} (aproximadamente 14 horas de dados contínuos).
+    \item \textbf{Lote 6} (janela temporal de 30 segundos de dados físicos): Simula uma transmissão de alta frequência e baixa latência (tempo real de monitoramento via redes LPWAN/LoRa);
+    \item \textbf{Lote 60} (janela temporal de 5 minutos): Representa telemetria típica de sensores agrícolas em ciclos regulares;
+    \item \textbf{Lote 720} (janela temporal de 1 hora): Mapeia relatórios agronômicos de hora em hora para análise de tendências climáticas;
+    \item \textbf{Lote 4.320} (janela temporal de 6 horas): Agrupa dados por turnos de trabalho (por exemplo, período da madrugada vs. manhã);
+    \item \textbf{Lote 20.000} (janela temporal de aproximadamente 14 horas de dados contínuos): Representa uma grande carga de dump de dados diários offline.
 \end{itemize}
 
 O experimento de compressão em lote foi executado 3 vezes independentes. Em cada rodada, gerou-se uma nova base de dados sintéticos via KDE com 40.000 leituras, de modo a garantir a análise de robustez estatística frente à variabilidade estocástica do gerador Rust.
@@ -649,13 +701,13 @@ A comparação visual das densidades de probabilidade e da classificação espac
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.8\textwidth}
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/densidade_artigo_original.png}
-    \caption{Dados Originais (R1 e R2)}
+    \caption{Dados Reais (Round 1 e Round 2)}
 \end{subfigure}
-\\ \vspace{1em}
-\begin{subfigure}[b]{0.8\textwidth}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/densidade_artigo_sintetico.png}
     \caption{Dados Sintéticos KDE}
@@ -673,13 +725,13 @@ Os correlogramas detalhados com a coloração dos pontos pelas classes classific
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.8\textwidth}
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/correlograma_r1_original.png}
     \caption{Round 1 - Original}
 \end{subfigure}
-\\ \vspace{1em}
-\begin{subfigure}[b]{0.8\textwidth}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/correlograma_r1_sintetico.png}
     \caption{Round 1 - Sintético}
@@ -691,13 +743,13 @@ Os correlogramas detalhados com a coloração dos pontos pelas classes classific
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.8\textwidth}
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/correlograma_r2_original.png}
     \caption{Round 2 - Original}
 \end{subfigure}
-\\ \vspace{1em}
-\begin{subfigure}[b]{0.8\textwidth}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{analise-experimentos/correlograma_r2_sintetico.png}
     \caption{Round 2 - Sintético}
@@ -713,7 +765,7 @@ Finalmente, a Figura~\ref{fig:densidade_global} apresenta a comparação global 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{analise-experimentos/densidade_global_comparacao.png}
+\includegraphics[width=11cm]{analise-experimentos/densidade_global_comparacao.png}
 \caption{Comparação de Densidade Bidimensional Completa (Original vs Sintético)}
 \label{fig:densidade_global}
 \fonte{O Autor (2026)}
