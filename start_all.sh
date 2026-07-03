@@ -20,16 +20,20 @@ echo "=========================================="
 
 projects="LoRa processador receiver simulador"
 
-for project in $projects; do
-    echo "🔨 Compilando $project..."
-    # Usamos subshell () para o cd não afetar o diretório raiz do loop
-    (cd "$project" && cargo build --target wasm32-wasip1)
-    if [ $? -ne 0 ]; then
-        echo "❌ Erro ao compilar $project. Abortando."
-        exit 1
-    fi
-    echo "✅ $project OK"
-done
+if command -v cargo >/dev/null 2>&1; then
+    for project in $projects; do
+        echo "🔨 Compilando $project..."
+        # Usamos subshell () para o cd não afetar o diretório raiz do loop
+        (cd "$project" && cargo build --target wasm32-wasip1)
+        if [ $? -ne 0 ]; then
+            echo "❌ Erro ao compilar $project. Abortando."
+            exit 1
+        fi
+        echo "✅ $project OK"
+    done
+else
+    echo "⚠️ Cargo não encontrado no ambiente WSL. Utilizando os binários compilados previamente no host."
+fi
 
 echo "=========================================="
 echo "🚀 Build concluído. Iniciando Modo: $MODE"
