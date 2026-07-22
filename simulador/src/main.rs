@@ -58,8 +58,12 @@ async fn main() -> Result<(), reqwest::Error> {
     let mut csv_index = 0;
     println!("✅ {} registros carregados do CSV.", records.len());
 
-    // Configura a frequência de transmissão (a cada 5 segundos)
-    let interval = Duration::from_secs(5); 
+    // Configura a frequência de transmissão (a cada 5 segundos por padrão, ou definido via env var INTERVAL_MS)
+    let interval_ms = std::env::var("INTERVAL_MS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(5000);
+    let interval = Duration::from_millis(interval_ms); 
     let mut next_time = Instant::now() + interval;
     
     let client = reqwest::Client::new();
@@ -67,7 +71,7 @@ async fn main() -> Result<(), reqwest::Error> {
 
     println!("Iniciando simulador de sensores - Usando dados do arquivo CSV...");
     println!("🌍 Ambiente: {}", ambiente);
-    println!("Enviando para {} a cada 5 segundos\n", target_url);
+    println!("Enviando para {} a cada {} ms\n", target_url, interval_ms);
 
     // Loop infinito de sensoriamento contínuo
     loop {
