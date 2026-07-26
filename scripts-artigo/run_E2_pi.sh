@@ -12,12 +12,12 @@ fi
 
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
-# 1. Instalar dependências apt (tcpdump, tshark, bc, time)
-echo "📦 Verificando dependências de sistema (tcpdump, tshark, bc, time)..."
-if ! command -v bc &> /dev/null || ! command -v tcpdump &> /dev/null || ! command -v tshark &> /dev/null; then
+# 1. Instalar dependências apt (tcpdump, tshark, bc, time, build-essential)
+echo "📦 Verificando dependências de sistema (tcpdump, tshark, bc, time, build-essential)..."
+if ! command -v bc &> /dev/null || ! command -v tcpdump &> /dev/null || ! command -v tshark &> /dev/null || ! command -v gcc &> /dev/null; then
     echo "💾 Instalando pacotes necessários via apt-get..."
     sudo apt-get update
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tcpdump tshark bc time
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tcpdump tshark bc time build-essential
 fi
 
 # 2. Instalar target Rust se necessário

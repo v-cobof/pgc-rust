@@ -12,7 +12,14 @@ fi
 
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
-# 1. Instalar target Rust se necessário
+# 1. Instalar dependências de compilação (build-essential)
+echo "📦 Verificando dependências de sistema (build-essential)..."
+if ! command -v gcc &> /dev/null; then
+    echo "💾 Instalando build-essential via apt-get..."
+    sudo apt-get update && sudo apt-get install -y build-essential
+fi
+
+# 2. Instalar target Rust se necessário
 echo "🦀 Instalando/Verificando target Rust wasm32-wasip1..."
 rustup target add wasm32-wasip1
 

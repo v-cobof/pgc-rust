@@ -12,11 +12,11 @@ fi
 
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
-# 1. Instalar dependências apt (time, bc)
-echo "📦 Verificando dependências de sistema (time, bc)..."
-if ! command -v bc &> /dev/null || [ ! -f /usr/bin/time ]; then
+# 1. Instalar dependências apt (time, bc, build-essential)
+echo "📦 Verificando dependências de sistema (time, bc, build-essential)..."
+if ! command -v bc &> /dev/null || [ ! -f /usr/bin/time ] || ! command -v gcc &> /dev/null; then
     echo "💾 Instalando pacotes necessários via apt-get..."
-    sudo apt-get update && sudo apt-get install -y time bc
+    sudo apt-get update && sudo apt-get install -y time bc build-essential
 fi
 
 # 2. Instalar target Rust se necessário

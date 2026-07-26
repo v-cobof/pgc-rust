@@ -12,11 +12,11 @@ fi
 
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
-# 1. Instalar dependências apt (curl)
-echo "📦 Verificando dependências de sistema (curl)..."
-if ! command -v curl &> /dev/null; then
-    echo "💾 Instalando curl..."
-    sudo apt-get update && sudo apt-get install -y curl
+# 1. Instalar dependências apt (curl, build-essential)
+echo "📦 Verificando dependências de sistema (curl, build-essential)..."
+if ! command -v curl &> /dev/null || ! command -v gcc &> /dev/null; then
+    echo "💾 Instalando pacotes necessários via apt-get..."
+    sudo apt-get update && sudo apt-get install -y curl build-essential
 fi
 
 # 2. Instalar target Rust se necessário
