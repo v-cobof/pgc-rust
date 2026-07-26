@@ -5,6 +5,11 @@
 
 set -e
 
+# Adicionar cargo ao path caso esteja no diretório padrão do rustup
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
 # 1. Instalar dependências apt (time, bc)
@@ -31,14 +36,20 @@ if ! command -v wasmedge &> /dev/null; then
 fi
 
 # 4. Compilar os códigos e copiar para a raiz
-echo "🛠️ Compilando processador Rust para nativo e WASM..."
+echo "🛠️ Compilando processador Rust para WASM..."
 cd processador
-cargo build --release
 cargo build --target wasm32-wasip1 --release
 cd ..
-
 cp processador/target/wasm32-wasip1/release/processador.wasm ./processador.wasm
-cp processador/target/release/processador ./processador_nativo
+
+echo "🛠️ Tentando compilar nativo local (opcional)..."
+if cd processador && cargo build --release >/dev/null 2>&1; then
+    cd ..
+    cp processador/target/release/processador ./processador_nativo
+else
+    cd ..
+    echo "⚠️  Compilação nativa falhou ou não é suportada diretamente no host. Pulando nativo..."
+fi
 
 # Configurações
 REPETICOES=10
@@ -107,20 +118,13 @@ run_benchmark() {
 }
 
 # Execução das baterias
-if [ -n "$NATIVO_BIN" ]; then
+if [ -f "$NATIVO_BIN" ]; then
     run_benchmark "nativo" "$NATIVO_BIN batch $DADO_CSV stats.json --tamanho-pacote $TAMANHO_LOTE"
 else
-    echo "⚠️  Binário nativo não localizado. Compilando nativo localmente..."
-    cargo build --release --manifest-path processador/Cargo.toml || true
-    if [ -f "./processador/target/release/processador" ]; then
-        NATIVO_BIN="./processador/target/release/processador"
-        run_benchmark "nativo" "$NATIVO_BIN batch $DADO_CSV stats.json --tamanho-pacote $TAMANHO_LOTE"
-    else
-        echo "❌ Falha ao compilar nativo. Pulando..."
-    fi
+    echo "⚠️  Binário nativo não localizado em $NATIVO_BIN. Pulando benchmark nativo..."
 fi
 
-if [ -n "$WASM_BIN" ]; then
+if [ -f "$WASM_BIN" ]; then
     run_benchmark "wasm_interpretado" "wasmedge --dir . $WASM_BIN batch $DADO_CSV stats.json --tamanho-pacote $TAMANHO_LOTE"
     
     echo "⚙️ Compilando $WASM_BIN para AOT..."
@@ -128,7 +132,7 @@ if [ -n "$WASM_BIN" ]; then
     run_benchmark "wasm_aot" "wasmedge --dir . processador_aot.wasm batch $DADO_CSV stats.json --tamanho-pacote $TAMANHO_LOTE"
     rm -f processador_aot.wasm
 else
-    echo "❌ Arquivo processador.wasm não localizado. Certifique-se de compilá-lo com target wasm32-wasip1."
+    echo "❌ Arquivo processador.wasm não localizado em $WASM_BIN. Certifique-se de compilá-lo com target wasm32-wasip1."
 fi
 
 echo "✅ Experimento E1 concluído. Resultados salvos em $RESULTADOS_CSV"

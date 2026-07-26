@@ -5,6 +5,11 @@
 
 set -e
 
+# Adicionar cargo ao path caso esteja no diretório padrão do rustup
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
 # 1. Instalar target Rust se necessário
@@ -94,7 +99,7 @@ elif [ "$SCENARIO" = "P2" ]; then
     echo "🚀 Rodando processador.wasm (Nuvem/Processador) na porta 8081 em background..."
     # Configura TARGET_URL para direcionar para o receiver local (porta 8082)
     export TARGET_URL="http://127.0.0.1:8082/receber"
-    wasmedge --dir . "$PROCESSADOR_WASM" online > processador_server.log 2>&1 &
+    wasmedge --dir . "$PROCESSADOR_WASM" 8081 > processador_server.log 2>&1 &
     
     echo "✅ Pronto! O receiver e o processador estão rodando. Aguardando dados do Pi..."
     echo "Pressione Ctrl+C ou rode '$0 stop' para finalizar."

@@ -5,6 +5,11 @@
 
 set -e
 
+# Adicionar cargo ao path caso esteja no diretório padrão do rustup
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
 # 1. Instalar dependências apt (curl)
@@ -31,14 +36,20 @@ if ! command -v wasmedge &> /dev/null; then
 fi
 
 # 4. Compilar os códigos e copiar para a raiz
-echo "🛠️ Compilando processador Rust para nativo e WASM..."
+echo "🛠️ Compilando processador Rust para WASM..."
 cd processador
-cargo build --release
 cargo build --target wasm32-wasip1 --release
 cd ..
-
 cp processador/target/wasm32-wasip1/release/processador.wasm ./processador.wasm
-cp processador/target/release/processador ./processador_nativo
+
+echo "🛠️ Tentando compilar nativo local (opcional)..."
+if cd processador && cargo build --release >/dev/null 2>&1; then
+    cd ..
+    cp processador/target/release/processador ./processador_nativo
+else
+    cd ..
+    echo "⚠️  Compilação nativa falhou ou não é suportada diretamente no host. Pulando nativo..."
+fi
 
 REPETICOES=10
 OUT_DIR="resultados-artigo/E3"
@@ -56,20 +67,22 @@ WASM_BIN="./processador.wasm"
 
 # Compilar AOT se WASM estiver disponível
 WASM_AOT=""
-if [ -n "$WASM_BIN" ]; then
+# Compilar AOT se WASM estiver disponível
+WASM_AOT=""
+if [ -f "$WASM_BIN" ]; then
     echo "⚙️ Compilando para AOT..."
     wasmedge compile "$WASM_BIN" processador_aot.wasm
     WASM_AOT="processador_aot.wasm"
 fi
 
 # Registrar tamanhos dos arquivos
-if [ -n "$NATIVO_BIN" ]; then
+if [ -f "$NATIVO_BIN" ]; then
     echo "nativo,$(stat -c %s "$NATIVO_BIN")" >> "$TAMANHOS_CSV"
 fi
-if [ -n "$WASM_BIN" ]; then
+if [ -f "$WASM_BIN" ]; then
     echo "wasm_interpretado,$(stat -c %s "$WASM_BIN")" >> "$TAMANHOS_CSV"
 fi
-if [ -n "$WASM_AOT" ]; then
+if [ -f "$WASM_AOT" ]; then
     echo "wasm_aot,$(stat -c %s "$WASM_AOT")" >> "$TAMANHOS_CSV"
 fi
 
@@ -117,14 +130,14 @@ measure_cold_start() {
 }
 
 # Medir cold start para cada motor
-if [ -n "$NATIVO_BIN" ]; then
-    measure_cold_start "nativo" "$NATIVO_BIN online"
+if [ -f "$NATIVO_BIN" ]; then
+    measure_cold_start "nativo" "$NATIVO_BIN 8081"
 fi
-if [ -n "$WASM_BIN" ]; then
-    measure_cold_start "wasm_interpretado" "wasmedge --dir . $WASM_BIN online"
+if [ -f "$WASM_BIN" ]; then
+    measure_cold_start "wasm_interpretado" "wasmedge --dir . $WASM_BIN 8081"
 fi
-if [ -n "$WASM_AOT" ]; then
-    measure_cold_start "wasm_aot" "wasmedge --dir . $WASM_AOT online"
+if [ -f "$WASM_AOT" ]; then
+    measure_cold_start "wasm_aot" "wasmedge --dir . $WASM_AOT 8081"
     rm -f processador_aot.wasm
 fi
 

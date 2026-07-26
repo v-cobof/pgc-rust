@@ -5,6 +5,11 @@
 
 set -e
 
+# Adicionar cargo ao path caso esteja no diretório padrão do rustup
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # === SETUP E COMPILAÇÃO DE DEPENDÊNCIAS ===
 
 # 1. Instalar dependências apt (tcpdump, tshark, bc, time)
@@ -168,7 +173,7 @@ if [ "$SCENARIO" = "P1" ]; then
     fi
     # P1: processador roda no Pi enviando para o server (porta 8082). Simulador envia para localhost:8081.
     export TARGET_URL="http://$SERVER_IP:8082/receber"
-    run_experiment_battery "P1" "wasmedge --dir . $PROCESSADOR_WASM online" "http://127.0.0.1:8081/inserir"
+    run_experiment_battery "P1" "wasmedge --dir . $PROCESSADOR_WASM 8081" "http://127.0.0.1:8081/inserir"
 
 elif [ "$SCENARIO" = "P2" ]; then
     if [ -z "$LORA_WASM" ]; then
