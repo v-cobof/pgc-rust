@@ -94,3 +94,17 @@ No Pi, execute a automação passando o cenário desejado, o IP do servidor e a 
   ```
 
 Os resultados de tempo e tráfego upstream em bytes serão compilados no arquivo `resultados-artigo/E2/resultados_E2.csv`.
+
+---
+
+### 5. (Opcional) Comparação com Docker (Cenário E3)
+
+Para comparar o footprint de memória e o tempo de boot (*cold start*) do WasmEdge rodando nativo na máquina contra um container Docker rodando o Rust Nativo (Linux ELF):
+
+```bash
+chmod +x scripts-artigo/run_docker_compare.sh
+./scripts-artigo/run_docker_compare.sh
+```
+
+Os resultados (tempo de inicialização em milissegundos e RAM em MB de 10 rodadas) serão gravados em `resultados-artigo/E3/docker_resultados.csv`.
+
