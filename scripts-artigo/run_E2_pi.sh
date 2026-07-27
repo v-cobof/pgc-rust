@@ -133,11 +133,12 @@ run_experiment_battery() {
         local tcpdump_pid=$!
         sleep 1
         
-        # 3. Executa o simulador até enviar todas as leituras de entrada.csv
-        echo "      [*] Iniciando envio de dados acelerado (INTERVAL_MS = $INTERVAL_MS)..."
+        # 3. Executa o simulador até enviar as leituras limitadas para benchmark
+        echo "      [*] Iniciando envio de dados acelerado (INTERVAL_MS = $INTERVAL_MS, LIMIT_READINGS = ${LIMIT_READINGS:-500})..."
         t0=$(date +%s%N)
         export INTERVAL_MS=$INTERVAL_MS
-        wasmedge --dir . "$SIMULADOR_WASM" "$simulator_target" > "$OUT_DIR/simulator_${label}_run_${r}.log" 2>&1 || true
+        export LIMIT_READINGS=${LIMIT_READINGS:-500}
+        wasmedge --dir . --env INTERVAL_MS="$INTERVAL_MS" --env LIMIT_READINGS="$LIMIT_READINGS" "$SIMULADOR_WASM" "$simulator_target" > "$OUT_DIR/simulator_${label}_run_${r}.log" 2>&1 || true
         t1=$(date +%s%N)
         
         # 4. Finalizar processos locais
@@ -146,17 +147,16 @@ run_experiment_battery() {
         wait $component_pid 2>/dev/null || true
         
         # Calcular tempo de transmissão
-        elapsed_seconds=$(echo "scale=3; ($t1 - t0) / 1000000000" | bc)
+        elapsed_seconds=$(echo "scale=3; ($t1 - $t0) / 1000000000" | bc)
         
         # Calcular tamanho do tráfego capturado
         local bytes=0
         if command -v capinfos >/dev/null 2>&1; then
-            bytes=$(capinfos -T -y "$pcap_file" 2>/dev/null | grep "File size" | awk '{print $3}')
-        elif command -v tshark >/dev/null 2>&1; then
-            bytes=$(tshark -r "$pcap_file" -z io,phs -q | grep "Avg Bps" | awk -F'|' '{print $2}' | tr -d ' ')
+            # Obtém o tamanho bruto dos dados (sem a string 'bytes')
+            bytes=$(capinfos "$pcap_file" 2>/dev/null | grep "Data size" | awk '{print $3}')
         else
             # Fallback para o tamanho do arquivo pcap
-            bytes=$(stat -c %s "$pcap_file" || ls -la "$pcap_file" | awk '{print $5}')
+            bytes=$(stat -c %s "$pcap_file" 2>/dev/null || echo 0)
         fi
         
         echo "      [RESULTADO] Tempo: ${elapsed_seconds}s | Tráfego: ${bytes} bytes"
@@ -173,7 +173,7 @@ if [ "$SCENARIO" = "P1" ]; then
     fi
     # P1: processador roda no Pi enviando para o server (porta 8082). Simulador envia para localhost:8081.
     export TARGET_URL="http://$SERVER_IP:8082/receber"
-    run_experiment_battery "P1" "wasmedge --dir . $PROCESSADOR_WASM 8081" "http://127.0.0.1:8081/inserir"
+    run_experiment_battery "P1" "wasmedge --dir . --env RECEIVER_URL=$TARGET_URL --env TRANSMIT_INTERVAL_SECS=3 $PROCESSADOR_WASM 8081 $TARGET_URL" "http://127.0.0.1:8081/inserir"
 
 elif [ "$SCENARIO" = "P2" ]; then
     if [ -z "$LORA_WASM" ]; then
@@ -183,7 +183,7 @@ elif [ "$SCENARIO" = "P2" ]; then
     fi
     # P2: lora (relay) roda no Pi encaminhando para o server (porta 8081). Simulador envia para localhost:8080.
     export PROCESSOR_URL="http://$SERVER_IP:8081/inserir"
-    run_experiment_battery "P2" "wasmedge --dir . $LORA_WASM" "http://127.0.0.1:8080/inserir"
+    run_experiment_battery "P2" "wasmedge --dir . --env PROCESSOR_URL=$PROCESSOR_URL $LORA_WASM 8080 $PROCESSOR_URL" "http://127.0.0.1:8080/inserir"
 fi
 
 stop_all

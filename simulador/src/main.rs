@@ -65,6 +65,15 @@ async fn main() -> Result<(), reqwest::Error> {
         .unwrap_or(5000);
     let interval = Duration::from_millis(interval_ms); 
     let mut next_time = Instant::now() + interval;
+
+    // Configura limites opcionais de execução para benchmarks
+    let limit_readings = std::env::var("LIMIT_READINGS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok());
+    let exit_on_eof = std::env::var("EXIT_ON_EOF")
+        .map(|v| v == "true" || v == "1")
+        .unwrap_or(false);
+    let mut sent_count = 0;
     
     let client = reqwest::Client::new();
     let mut _rng = rand::thread_rng(); // RNG disponível para propósitos gerais
@@ -73,8 +82,15 @@ async fn main() -> Result<(), reqwest::Error> {
     println!("🌍 Ambiente: {}", ambiente);
     println!("Enviando para {} a cada {} ms\n", target_url, interval_ms);
 
-    // Loop infinito de sensoriamento contínuo
+    // Loop de sensoriamento contínuo (pode ser limitado por variáveis de ambiente)
     loop {
+        if let Some(limit) = limit_readings {
+            if sent_count >= limit {
+                println!("✅ Limite de {} leituras atingido. Encerrando simulador.", limit);
+                break;
+            }
+        }
+
         let hora_atual = chrono::Local::now().hour();
 
         /* --- BLOCADO: Lógica de Geração Aleatória Original ---
@@ -94,7 +110,17 @@ async fn main() -> Result<(), reqwest::Error> {
         let record = &records[csv_index];
         let temperature = record.temperatura;
         let humidity = record.umidade;
-        csv_index = (csv_index + 1) % records.len();
+        
+        csv_index += 1;
+        if csv_index >= records.len() {
+            if exit_on_eof {
+                println!("✅ Fim do arquivo CSV atingido. Encerrando simulador.");
+                break;
+            }
+            csv_index = 0;
+        }
+
+        sent_count += 1;
         
         let timestamp = chrono::Utc::now().timestamp() as u64;
 
@@ -124,4 +150,6 @@ async fn main() -> Result<(), reqwest::Error> {
         time::sleep(next_time - Instant::now()).await;
         next_time += interval;
     }
+
+    Ok(())
 }

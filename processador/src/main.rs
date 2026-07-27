@@ -892,7 +892,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let ambiente_clone = ambiente.clone();
     tokio::spawn(async move {
         let client = reqwest::Client::new();
-        let interval = tokio::time::Duration::from_secs(30);
+        let interval_secs = std::env::var("TRANSMIT_INTERVAL_SECS")
+            .ok()
+            .and_then(|v| v.parse::<u64>().ok())
+            .unwrap_or(30);
+        let interval = tokio::time::Duration::from_secs(interval_secs);
         
         loop {
             tokio::time::sleep(interval).await;

@@ -43,7 +43,7 @@ fi
 # 3. Gerar o Dockerfile dinamicamente na raiz
 echo "🐳 Gerando Dockerfile temporário com Rust Nativo..."
 cat << 'EOF' > Dockerfile.tmp
-FROM debian:slim
+FROM ubuntu:22.04
 
 # Instalar curl para o health check/polling do script
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
