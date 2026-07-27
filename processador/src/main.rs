@@ -891,7 +891,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let receiver_url_clone = receiver_url.clone();
     let ambiente_clone = ambiente.clone();
     tokio::spawn(async move {
-        let client = reqwest::Client::new();
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(5))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
         let interval_secs = std::env::var("TRANSMIT_INTERVAL_SECS")
             .ok()
             .and_then(|v| v.parse::<u64>().ok())
@@ -924,8 +927,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                     println!("📤 {} [Fog]: Enviando dados RLE para o Receiver...", ambiente_clone);
                 }
                 
-                // POST para o receiver alvo
+                // POST para o receiver alvo com cabeçalho Connection: close para evitar hangs no WasmEdge
                 let res: Result<reqwest::Response, reqwest::Error> = client.post(&receiver_url_clone)
+                    .header("Connection", "close")
                     .json(&payload)
                     .send()
                     .await;
